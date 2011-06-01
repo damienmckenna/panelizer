@@ -340,7 +340,7 @@ function panelizer_load_default_by_name($load_name, $default_anyway = FALSE) {
  * to them. This fetches the display, if there is one.
  */
 function panelizer_load_default($type, $key, $name, $default_anyway = FALSE) {
-  $load_name = $type . ':' . $key. ':' . $name;
+  $load_name = $type . ':' . $key . ':' . $name;
   return _panelizer_load_default($type, $key, $name, $load_name, $default_anyway);
 }
 
@@ -539,7 +539,7 @@ function panelizer_context_cache_clear($type, $key) {
 function panelizer_panels_cache_get($argument) {
   ctools_include('object-cache');
   list($type, $key) = explode(':', $argument, 2);
-  $cache = ctools_object_cache_get('panelizer_display_cache', $type . ':' .$key);
+  $cache = ctools_object_cache_get('panelizer_display_cache', $type . ':' . $key);
   if (!empty($cache)) {
     $cache->cached = TRUE;
     switch ($type) {
@@ -592,7 +592,7 @@ function panelizer_panels_cache_get($argument) {
 function panelizer_panels_cache_set($argument, $cache) {
   list($type, $key) = explode(':', $argument, 2);
   ctools_include('object-cache');
-  ctools_object_cache_set('panelizer_display_cache', $type . ':' .$key, $cache);
+  ctools_object_cache_set('panelizer_display_cache', $type . ':' . $key, $cache);
 }
 
 /**
@@ -601,7 +601,7 @@ function panelizer_panels_cache_set($argument, $cache) {
 function panelizer_panels_cache_clear($argument, $cache) {
   list($type, $key) = explode(':', $argument, 2);
   ctools_include('object-cache');
-  ctools_object_cache_clear('panelizer_display_cache', $type . ':' .$key);
+  ctools_object_cache_clear('panelizer_display_cache', $type . ':' . $key);
 }
 
 /**

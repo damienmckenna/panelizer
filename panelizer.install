@@ -4,8 +4,8 @@
  * Implementation of hook_schema().
  */
 function panelizer_schema() {
-  // This should always point to our 'current' schema. This makes it relatively easy
-  // to keep a record of schema as we make changes to it.
+  // This should always point to our 'current' schema. This makes it
+  // relatively easy to keep a record of schema as we make changes to it.
   return panelizer_schema_1();
 }
 

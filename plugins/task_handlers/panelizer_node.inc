@@ -13,12 +13,10 @@ $plugin = array(
   'handler type' => 'context',
   // may NOT be added up front.
   'visible' => FALSE,
-
   // Administrative fields.
   'title' => t('Panelizer'),
-  'admin summary' =>'panelizer_panelizer_task_admin_summary',
+  'admin summary' => 'panelizer_panelizer_task_admin_summary',
   'operations' => array(),
-
   // Callback to render the data.
   'render' => 'panelizer_panelizer_task_render',
 );
@@ -45,8 +43,14 @@ function panelizer_panelizer_task_admin_summary($handler, $task, $subtask, $page
   $access = t('This variant will be selected if the node being viewed is panelized. This variant must be enabled and selected for panelizer to work!');
 
   $rows[] = array(
-    array('class' => t('page-summary-label'), 'data' => t('Selection rule')),
-    array('class' => t('page-summary-data'), 'data' => $access),
+    array(
+      'class' => t('page-summary-label'),
+      'data' => t('Selection rule'),
+    ),
+    array(
+      'class' => t('page-summary-data'),
+      'data' => $access,
+    ),
     array('class' => t('page-summary-operation'), ''),
   );
 

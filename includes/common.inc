@@ -122,6 +122,9 @@ function panelizer_default_context_form(&$form_state) {
   elseif (!module_exists('token')) {
     $description = t('More keywords will be available if you install the Token module, see http://drupal.org/project/token.');
   }
+  else {
+    $description = '';
+  }
 
   $form['left']['summary'] = array(
     '#prefix' => '<div class="page-manager-contexts">',
