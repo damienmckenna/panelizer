@@ -268,6 +268,27 @@ function panelizer_has_no_choice_callback($type, $key) {
 // @todo -- need a nodeapi hook for insert/update so that node_save() can work
 // as expected if panelizer settings are attached to the node.
 
+/**
+ * Implements hook_nodeapi().
+ */
+function panelizer_nodeapi(&$node, $op) {
+  switch($op) {
+    case 'delete':
+      return panelizer_node_delete($node);
+
+  }
+}
+
+/**
+ * Implements hook_nodeapi() for delete (D7's hook_node_delete()).
+ */
+function panelizer_node_delete($node) {
+  ctools_include('node', 'panelizer');
+  $panelizer = panelizer_load_node_panelizer($node);
+  panelizer_delete_node_panelizer($panelizer);
+}
+
+
 // ---------------------------------------------------------------------------
 // Panelizer object access routines
 

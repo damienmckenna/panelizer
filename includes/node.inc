@@ -88,6 +88,16 @@ function panelizer_save_node_panelizer($panelizer) {
 }
 
 /**
+ * Delete a panelizer node panel from the database.
+ */
+function panelizer_delete_node_panelizer($panelizer) {
+  if (!empty($panelizer->did)) {
+    panels_delete_display($panelizer->did);
+    db_query("DELETE FROM {panelizer_node} WHERE nid = %d", $panelizer->nid);
+  }
+}
+
+/**
  * Page to edit basic settings on a panelized node.
  */
 function panelizer_edit_node_settings_page($node) {
@@ -112,6 +122,7 @@ function panelizer_edit_node_settings_page($node) {
 
   $form_state = array(
     'panelizer' => &$panelizer,
+    'node' => $node,
     'no_redirect' => TRUE,
   );
 
@@ -119,8 +130,6 @@ function panelizer_edit_node_settings_page($node) {
   ctools_include('common', 'panelizer');
   $output = ctools_build_form($form_id, $form_state);
   if (!empty($form_state['executed'])) {
-    drupal_set_message(t('The settings have been updated.'));
-    panelizer_save_node_panelizer($panelizer);
     drupal_goto($_GET['q']);
   }
 
