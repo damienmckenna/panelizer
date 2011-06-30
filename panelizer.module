@@ -728,3 +728,13 @@ function panelizer_panelizer_default_types_alter(&$types, $type) {
     case 'user':
   }
 }
+
+/**
+ * Implementation of hook_views_api().
+ */
+function panelizer_views_api() {
+  return array(
+    'api' => 2.0,
+    'path' => drupal_get_path('module', 'panelizer') .'/plugins/views',
+  );
+}
