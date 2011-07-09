@@ -194,6 +194,7 @@ function panelizer_edit_node_settings_page($node) {
   }
   else {
     $form_id = 'panelizer_settings_form';
+    $reset_button = TRUE;
   }
 
   $form_state = array(
@@ -201,12 +202,23 @@ function panelizer_edit_node_settings_page($node) {
     'no_redirect' => TRUE,
   );
 
+  if (!empty($reset_button)) {
+    $form_state['reset button'] = TRUE;
+  }
+
   ctools_include('form');
   ctools_include('common', 'panelizer');
   $output = ctools_build_form($form_id, $form_state);
   if (!empty($form_state['executed'])) {
-    drupal_set_message(t('The settings have been updated.'));
-    panelizer_save_node_panelizer($panelizer);
+    if (empty($form_state['clicked_button']['#reset'])) {
+      drupal_set_message(t('The settings have been updated.'));
+      panelizer_save_node_panelizer($panelizer);
+    }
+    else {
+      panelizer_delete_node_panelizer($panelizer);
+      drupal_set_message(t('The node panel has been reset to the default.'));
+    }
+
     drupal_goto($_GET['q']);
   }
 
