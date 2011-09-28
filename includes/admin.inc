@@ -130,7 +130,7 @@ function panelizer_settings_page_form(&$form_state) {
         '#dependency_count' => 2,
         '#dependency' => array(
           $base_id . '-default' => array(TRUE),
-          $base_id . '-choice' => array(FALSE),
+          $base_id . '-status' => array(TRUE),
         ),
       );
 
@@ -256,21 +256,42 @@ function panelizer_default_settings_page($type, $key, $name) {
   $form_state = array(
     'panelizer' => &$panelizer,
     'no_redirect' => TRUE,
+    'reset button' => TRUE,
   );
 
   ctools_include('form');
   ctools_include('common', 'panelizer');
   $output = ctools_build_form('panelizer_settings_form', $form_state);
   if (!empty($form_state['executed'])) {
-    drupal_set_message(t('The settings have been updated.'));
-    ctools_include('export');
-    ctools_export_crud_save('panelizer_defaults', $panelizer);
+    if (empty($form_state['clicked_button']['#reset'])) {
+      ctools_include('export');
+      ctools_export_crud_save('panelizer_defaults', $panelizer);
+      drupal_set_message(t('The settings have been updated.'));
+    }
+    else {
+      panelizer_delete_panelizer_defaults($panelizer);
+      drupal_set_message(t('The content type panel has been reset to the default.'));
+    }
+
     drupal_goto($_GET['q']);
   }
 
   return $output;
 }
 
+/**
+ * Delete a panelizer node panel from the database.
+ */
+function panelizer_delete_panelizer_defaults($panelizer) {
+  if (!empty($panelizer->pnid)) {
+    if (!empty($panelizer->did)) {
+      panels_delete_display($panelizer->did);
+    }
+    db_delete('panelizer_defaults')
+      ->condition('pnid', $panelizer->pnid)
+      ->execute();
+  }
+}
 
 /**
  * Page to configure what content is available for a given node type.
