@@ -19,8 +19,15 @@ $plugin = array(
   'operations' => array(),
   // Callback to render the data.
   'render' => 'panelizer_panelizer_task_render',
+  'test' => 'panelizer_panelizer_task_test',
 );
 
+<<<<<<< HEAD
+=======
+/**
+ * Callback to provide administrative summary of the task handler.
+ */
+>>>>>>> f987610... Issue #1268902 by John Morahan: Panelizer task handler did not properly test to see if the node is actually panelized, inadvertently short circuiting other variants.
 function panelizer_panelizer_task_admin_summary($handler, $task, $subtask, $page, $show_title = TRUE) {
   $output = '';
 
@@ -82,4 +89,36 @@ function panelizer_panelizer_task_render($handler, $base_contexts, $args, $test 
   // Load the panelizer and render the display.
   ctools_include('node', 'panelizer');
   return panelizer_render_node($node, $args);
+}
+
+/**
+ * Determine if the panelizer task handler should fire.
+ *
+ * This returns true if the configured node is panelized and has
+ * a display.
+ */
+function panelizer_panelizer_task_test($handler, $base_contexts) {
+  if (empty($base_contexts)) {
+    return;
+  }
+
+  $context = reset($base_contexts);
+  if (empty($context->data)) {
+    return;
+  }
+
+  $node = &$context->data;
+  ctools_include('node', 'panelizer');
+  $panelizer = panelizer_load_node_panelizer($node);
+  if (empty($panelizer)) {
+    return FALSE;
+  }
+
+  // Load the display
+  $display = panelizer_load_display($panelizer);
+  if (empty($display)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
