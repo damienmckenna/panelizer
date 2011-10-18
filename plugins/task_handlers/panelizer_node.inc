@@ -22,12 +22,9 @@ $plugin = array(
   'test' => 'panelizer_panelizer_task_test',
 );
 
-<<<<<<< HEAD
-=======
 /**
  * Callback to provide administrative summary of the task handler.
  */
->>>>>>> f987610... Issue #1268902 by John Morahan: Panelizer task handler did not properly test to see if the node is actually panelized, inadvertently short circuiting other variants.
 function panelizer_panelizer_task_admin_summary($handler, $task, $subtask, $page, $show_title = TRUE) {
   $output = '';
 
