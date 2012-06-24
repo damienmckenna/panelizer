@@ -197,6 +197,8 @@ function panelizer_edit_node_settings_page($node) {
     $reset_button = TRUE;
   }
 
+  _panelizer_check_admin_theme();
+
   $form_state = array(
     'panelizer' => &$panelizer,
     'no_redirect' => TRUE,
@@ -250,6 +252,8 @@ function panelizer_edit_node_context_page($node) {
     return MENU_NOT_FOUND;
   }
 
+  _panelizer_check_admin_theme();
+
   $form_state = array(
     'panelizer' => &$panelizer,
     'panelizer type' => 'node',
@@ -286,6 +290,8 @@ function panelizer_edit_node_layout_page($node) {
     return MENU_NOT_FOUND;
   }
 
+  _panelizer_check_admin_theme();
+
   $display = panelizer_load_display($panelizer);
 
   ctools_include('context');
@@ -318,6 +324,8 @@ function panelizer_edit_node_content_page($node) {
   if (empty($panelizer)) {
     return MENU_NOT_FOUND;
   }
+
+  _panelizer_check_admin_theme();
 
   $cache = panels_edit_cache_get('panelizer:node:' . $node->nid);
 
@@ -474,4 +482,18 @@ function panelizer_get_base_context_node($object = NULL) {
   $context->identifier = t('This node');
   $context->keyword = 'node';
   return array('panelizer' => $context);
+}
+
+/**
+ * Switch to the administration theme on node/%node/panelizer/* if needed.
+ *
+ * Sadly, in D6 there's no such thing as hook_admin_paths(), so we have to do
+ * this ourselves.
+ */
+function _panelizer_check_admin_theme() {
+  if (variable_get('node_admin_theme', '0')) {
+    global $custom_theme;
+    $custom_theme = variable_get('admin_theme', '0');
+    drupal_add_css(drupal_get_path('module', 'system') .'/admin.css', 'module');
+  }
 }
