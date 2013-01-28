@@ -208,13 +208,27 @@ function panelizer_edit_node_settings_page($node) {
     $form_state['reset button'] = TRUE;
   }
 
+  // load a comparison panelizer so that we can detect changes to the load object
+  $compare_panelizer = panelizer_load_node_panelizer($node, TRUE);
+
   ctools_include('form');
   ctools_include('common', 'panelizer');
   $output = ctools_build_form($form_id, $form_state);
   if (!empty($form_state['executed'])) {
     if (empty($form_state['clicked_button']['#reset'])) {
-      drupal_set_message(t('The settings have been updated.'));
-      panelizer_save_node_panelizer($panelizer);
+      $difference = false;
+      foreach($panelizer as $key => $value){
+        if($value != $compare_panelizer->$key){
+          $difference = true;
+        }
+      }
+      if ($difference){
+        drupal_set_message(t('The settings have been updated.'));
+        panelizer_save_node_panelizer($panelizer);
+      }
+      else{
+        drupal_set_message(t('No changes found, using original settings.'));
+      }
     }
     else {
       panelizer_delete_node_panelizer($panelizer);
