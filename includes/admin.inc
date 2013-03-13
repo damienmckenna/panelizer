@@ -287,9 +287,7 @@ function panelizer_delete_panelizer_defaults($panelizer) {
     if (!empty($panelizer->did)) {
       panels_delete_display($panelizer->did);
     }
-    db_delete('panelizer_defaults')
-      ->condition('pnid', $panelizer->pnid)
-      ->execute();
+    db_query('DELETE FROM {panelizer_defaults} WHERE pnid = %d', $panelizer->pnid);
   }
 }
 
