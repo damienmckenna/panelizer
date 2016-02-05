@@ -4,7 +4,10 @@
  * Hook implementations for the Panelizer module.
  */
 
+use \Drupal\Core\Entity\FieldableEntityInterface;
+use \Drupal\Core\Entity\RevisionableInterface;
 use \Drupal\Core\Form\FormStateInterface;
+use \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant;
 
 /**
  * Implements hook_theme().
@@ -31,6 +34,97 @@ function panelizer_entity_type_alter(array &$entity_types) {
       $entity_types[$entity_type_id]->setHandlerClass('fallback_view_builder', $entity_types[$entity_type_id]->getHandlerClass('view_builder'));
       $entity_types[$entity_type_id]->setHandlerClass('view_builder', '\Drupal\panelizer\PanelizerEntityViewBuilder');
     }
+  }
+}
+
+/**
+ * Implements hook_panels_build_alter().
+ */
+function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_display) {
+  $builder = $panels_display->getBuilder();
+  $storage_type = $panels_display->getStorageType();
+
+  // Add our Javascript customizations for the IPE.
+  if ($builder->getPluginId() == 'ipe' && in_array($storage_type, ['panelizer_default', 'panelizer_field'])) {
+    $build['#attached']['library'][] = 'panelizer/panels_ipe';
+
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    $entity = $panels_display->getContexts()['@panelizer.entity_context:entity']->getContextValue();
+    $revision_id = ($entity instanceof RevisionableInterface) && !$entity->isDefaultRevision() ? $entity->getRevisionId() : NULL;
+    list (,, $view_mode) = explode(':', $panels_display->getStorageId());
+
+    // @todo: Check that saving as custom is even allowed!
+
+    // Get the default storage id.
+    $default = 'default';
+    if ($panels_display->getStorageType() == 'panelizer_field') {
+      $panelizer_default_storage_id = implode(':', [$entity->getEntityTypeId(), $entity->bundle(), $view_mode, $default]);
+    }
+    else {
+      $panelizer_default_storage_id = $panels_display->getStorageId();
+    }
+
+    // Get the custom storage id (omitting revision id if this is the default
+    // revision).
+    $panelizer_field_storage_id_parts = [$entity->getEntityTypeId(), $entity->id(), $view_mode];
+    if ($revision_id) {
+      $panelizer_field_storage_id_parts[] = $revision_id;
+    }
+    $panelizer_field_storage_id = implode(':', $panelizer_field_storage_id_parts);
+
+    /** @var \Drupal\panelizer\PanelizerInterface $panelizer */
+    $panelizer = \Drupal::service('panelizer');
+
+    $build['#attached']['drupalSettings']['panelizer']['entity'] = [
+      'entity_type_id' => $entity->getEntityTypeId(),
+      'entity_id' => $entity->id(),
+      'view_mode' => $view_mode,
+      'revision_id' => $revision_id,
+      'panelizer_default_storage_id' => $panelizer->hasDefaultPermission('change content', $entity->getEntityTypeId(), $entity->bundle(), $view_mode, $default) ? $panelizer_default_storage_id : FALSE,
+      'panelizer_field_storage_id' => $panelizer->hasEntityPermission('change content', $entity, $view_mode) ? $panelizer_field_storage_id : FALSE,
+    ];
+
+    // If using panelizer_field, we change the storage id to match what we
+    // put together here because it'll have the revision id omitted in the
+    // right situation.
+    if ($panels_display->getStorageType() == 'panelizer_field') {
+      $build['#attached']['drupalSettings']['panels_ipe']['panels_display']['storage_id'] = $panelizer_field_storage_id;
+    }
+  }
+}
+
+/**
+ * Implements hook_panels_ipe_panels_display_presave().
+ */
+function panelizer_panels_ipe_panels_display_presave(PanelsDisplayVariant $panels_display, array $layout_model) {
+  if (empty($layout_model['panelizer_save_as'])) {
+    return;
+  }
+
+  // See if the user requested changing the storage type.
+  $current_storage = $panels_display->getStorageType();
+  $panelizer_save_as = $layout_model['panelizer_save_as'];
+  if ($current_storage !== $panelizer_save_as) {
+    $panelizer_entity = $layout_model['panelizer_entity'];
+
+    // If we were custom and now we want to save to the default, we need to
+    // save specially to the Panelizer field so that we can tell it we're on
+    // a default.
+    if ($panelizer_save_as == 'panelizer_default') {
+      /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+      $entity_type_manager = \Drupal::service("entity_type.manager");
+      $storage = $entity_type_manager->getStorage($panelizer_entity['entity_type_id']);
+      $entity = $storage->load($panelizer_entity['entity_id']);
+      if ($entity instanceof FieldableEntityInterface) {
+        /** @var \Drupal\panelizer\PanelizerInterface $panelizer */
+        $panelizer = \Drupal::service('panelizer');
+        list (,,, $default_name) = explode(':', $panelizer_entity['panelizer_default_storage_id']);
+        $panelizer->setPanelsDisplay($entity, $panelizer_entity['view_mode'], $default_name);
+      }
+    }
+
+    // Set the new storage information.
+    $panels_display->setStorage($panelizer_save_as, $panelizer_entity[$panelizer_save_as . '_storage_id']);
   }
 }
 

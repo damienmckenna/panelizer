@@ -9,12 +9,15 @@ namespace Drupal\panelizer\Plugin\PanelsStorage;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\panelizer\PanelizerInterface;
+use Drupal\panelizer\Plugin\Field\FieldType\PanelizerFieldType;
 use Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant;
 use Drupal\panels\Storage\PanelsStorageBase;
-use Drupal\panels\Storage\PanelsStorageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Panels storage service that stores Panels displays in the Panelizer field.
@@ -102,7 +105,16 @@ class PanelizerFieldPanelsStorage extends PanelsStorageBase implements Container
    * {@inheritdoc}
    */
   public function save(PanelsDisplayVariant $panels_display) {
-    // TODO: Implement save() method.
+    $id = $panels_display->getStorageId();
+    if ($entity = $this->loadEntity($id)) {
+      list (,, $view_mode) = explode(':', $id);
+      if ($entity instanceof FieldableEntityInterface) {
+        $this->panelizer->setPanelsDisplay($entity, $view_mode, NULL, $panels_display);
+      }
+    }
+    else {
+      throw new \Exception("Couldn't find entity to store Panels display on");
+    }
   }
 
   /**
@@ -110,8 +122,9 @@ class PanelizerFieldPanelsStorage extends PanelsStorageBase implements Container
    */
   public function access($id, $op, AccountInterface $account) {
     if ($entity = $this->loadEntity($id)) {
-      if ($entity->access($op, $account)) {
-        if ($op == 'read' || $account->hasPermission("administer panelizer {$entity->getEntityTypeId()} {$entity->bundle()} defaults") || $account->hasPermission("administer panelizer {$entity->getEntityTypeId()} {$entity->bundle()} content")) {
+      if ($entity->access($op, $account) && $entity instanceof FieldableEntityInterface) {
+        list (,, $view_mode) = explode(':', $id);
+        if ($op == 'read' || $this->panelizer->hasEntityPermission('change content', $entity, $view_mode, $account)) {
           return AccessResult::allowed();
         }
       }
