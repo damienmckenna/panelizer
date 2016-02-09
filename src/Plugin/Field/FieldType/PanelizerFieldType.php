@@ -99,6 +99,7 @@ class PanelizerFieldType extends FieldItemBase {
     $panels_manager = static::getPanelsDisplayManager();
     $sample_display = $panels_manager->createDisplay();
 
+    $values['view_mode'] = 'default';
     $values['default'] = NULL;
     $values['panels_display'] = $panels_manager->exportDisplay($sample_display);
     return $values;
