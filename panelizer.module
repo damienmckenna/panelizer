@@ -53,8 +53,6 @@ function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_disp
     $revision_id = ($entity instanceof RevisionableInterface) && !$entity->isDefaultRevision() ? $entity->getRevisionId() : NULL;
     list (,, $view_mode) = explode(':', $panels_display->getStorageId());
 
-    // @todo: Check that saving as custom is even allowed!
-
     // Get the default storage id.
     $default = 'default';
     if ($panels_display->getStorageType() == 'panelizer_field') {
@@ -63,6 +61,10 @@ function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_disp
     else {
       $panelizer_default_storage_id = $panels_display->getStorageId();
     }
+
+    // Get the special, internal default storage id that includes the entity id,
+    // which will allow us to correctly set the contexts on the Panels display.
+    $panelizer_default_internal_storage_id = '*' . implode(':', [$entity->getEntityTypeId(), $entity->id(), $view_mode, $default]);
 
     // Get the custom storage id (omitting revision id if this is the default
     // revision).
@@ -80,15 +82,22 @@ function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_disp
       'entity_id' => $entity->id(),
       'view_mode' => $view_mode,
       'revision_id' => $revision_id,
-      'panelizer_default_storage_id' => $panelizer->hasDefaultPermission('change content', $entity->getEntityTypeId(), $entity->bundle(), $view_mode, $default) ? $panelizer_default_storage_id : FALSE,
+      'panelizer_default_storage_id' => $panelizer->hasDefaultPermission('change content', $entity->getEntityTypeId(), $entity->bundle(), $view_mode, $default) ? $panelizer_default_internal_storage_id : FALSE,
       'panelizer_field_storage_id' => $panelizer->hasEntityPermission('change content', $entity, $view_mode) ? $panelizer_field_storage_id : FALSE,
+      'panelizer_default_real_storage_id' => $panelizer_default_storage_id,
     ];
 
-    // If using panelizer_field, we change the storage id to match what we
-    // put together here because it'll have the revision id omitted in the
-    // right situation.
+
     if ($panels_display->getStorageType() == 'panelizer_field') {
+      // If using panelizer_field, we change the storage id to match what we
+      // put together here because it'll have the revision id omitted in the
+      // right situation.
       $build['#attached']['drupalSettings']['panels_ipe']['panels_display']['storage_id'] = $panelizer_field_storage_id;
+    }
+    else {
+      // If using panelizer_default, we need to switch to a the special,
+      // internal storage id.
+      $build['#attached']['drupalSettings']['panels_ipe']['panels_display']['storage_id'] = $panelizer_default_internal_storage_id;
     }
   }
 }
@@ -106,6 +115,10 @@ function panelizer_panels_ipe_panels_display_presave(PanelsDisplayVariant $panel
   $panelizer_save_as = $layout_model['panelizer_save_as'];
   if ($current_storage !== $panelizer_save_as) {
     $panelizer_entity = $layout_model['panelizer_entity'];
+
+    // When actually saving, we want to use the real storage id for me the
+    // Panelizer default.
+    $panelizer_entity['panelizer_default_storage_id'] = $panelizer_entity['panelizer_default_real_storage_id'];
 
     // If we were custom and now we want to save to the default, we need to
     // save specially to the Panelizer field so that we can tell it we're on

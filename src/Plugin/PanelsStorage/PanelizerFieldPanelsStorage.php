@@ -10,11 +10,11 @@ namespace Drupal\panelizer\Plugin\PanelsStorage;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\panelizer\PanelizerInterface;
-use Drupal\panelizer\Plugin\Field\FieldType\PanelizerFieldType;
 use Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant;
 use Drupal\panels\Storage\PanelsStorageBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -96,8 +96,14 @@ class PanelizerFieldPanelsStorage extends PanelsStorageBase implements Container
    */
   public function load($id) {
     if ($entity = $this->loadEntity($id)) {
-      list (,,$view_mode) = explode(':', $id);
-      return $this->panelizer->getPanelsDisplay($entity, $view_mode);
+      list ($entity_type_id, , $view_mode) = explode(':', $id);
+      $panels_display = $this->panelizer->getPanelsDisplay($entity, $view_mode);
+      // Set the entity as a context on the Panels display.
+      $contexts = [
+        '@panelizer.entity_context:entity' => new Context(new ContextDefinition('entity:' . $entity_type_id, NULL, TRUE), $entity),
+      ];
+      $panels_display->setContexts($contexts);
+      return $panels_display;
     }
   }
 

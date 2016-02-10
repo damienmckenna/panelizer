@@ -10,11 +10,12 @@ namespace Drupal\panelizer\Plugin\PanelsStorage;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\Context\Context;
+use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\panelizer\PanelizerInterface;
 use Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant;
 use Drupal\panels\Storage\PanelsStorageBase;
-use Drupal\panels\Storage\PanelsStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -68,11 +69,55 @@ class PanelizerDefaultPanelsStorage extends PanelsStorageBase implements Contain
   }
 
   /**
+   * Converts the storage id into its component parts.
+   *
+   * @param string $id
+   *   The storage id. There are two formats that can potentially be used:
+   *   - The first is the normal format that we actually store:
+   *     "entity_type_id:bundle:view_mode:name"
+   *   - The second is a special internal format we use in the IPE so we can
+   *   correctly set context:
+   *     "*entity_type_id:entity_id:view_mode:name"
+   *
+   * @return array
+   *   An array with 4 or 5 items:
+   *   - Entity type id: string
+   *   - Bundle name: string
+   *   - View mode: string
+   *   - Default name: string
+   *   - Entity: \Drupal\Core\Entity\EntityInterface|NULL
+   */
+  protected function parseId($id) {
+    list ($entity_type_id, $part_two, $view_mode, $name) = explode(':', $id);
+
+    if (strpos($entity_type_id, '*') === 0) {
+      $entity_type_id = substr($entity_type_id, 1);
+      $storage = $this->entityTypeManager->getStorage($entity_type_id);
+      $entity = $storage->load($part_two);
+      $bundle = $entity->bundle();
+    }
+    else {
+      $entity = NULL;
+      $bundle = $part_two;
+    }
+
+    return [$entity_type_id, $bundle, $view_mode, $name, $entity];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function load($id) {
-    list ($entity_type_id, $bundle, $view_mode, $name) = explode(':', $id);
-    return $this->panelizer->getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode);
+    list ($entity_type_id, $bundle, $view_mode, $name, $entity) = $this->parseId($id);
+    $panels_display = $this->panelizer->getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode);
+    // Set a placeholder context so that the calling code knows that we need
+    // an entity context. If we have the value available, then we actually set
+    // the context value.
+    $contexts = [
+      '@panelizer.entity_context:entity' => new Context(new ContextDefinition('entity:' . $entity_type_id, NULL, TRUE), $entity),
+    ];
+    $panels_display->setContexts($contexts);
+    return $panels_display;
   }
 
   /**
@@ -80,7 +125,7 @@ class PanelizerDefaultPanelsStorage extends PanelsStorageBase implements Contain
    */
   public function save(PanelsDisplayVariant $panels_display) {
     $id = $panels_display->getStorageId();
-    list ($entity_type_id, $bundle, $view_mode, $name) = explode(':', $id);
+    list ($entity_type_id, $bundle, $view_mode, $name) = $this->parseId($id);
     return $this->panelizer->setDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode, $panels_display);
   }
 
@@ -88,7 +133,7 @@ class PanelizerDefaultPanelsStorage extends PanelsStorageBase implements Contain
    * {@inheritdoc}
    */
   public function access($id, $op, AccountInterface $account) {
-    list ($entity_type_id, $bundle, $view_mode, $name) = explode(':', $id);
+    list ($entity_type_id, $bundle, $view_mode, $name) = $this->parseId($id);
     if ($panels_display = $this->panelizer->getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode)) {
       if ($op == 'read' || $this->panelizer->hasDefaultPermission('change content', $entity_type_id, $bundle, $view_mode, $name, $account)) {
         return AccessResult::allowed();
