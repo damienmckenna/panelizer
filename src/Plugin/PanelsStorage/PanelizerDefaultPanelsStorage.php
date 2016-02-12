@@ -135,7 +135,12 @@ class PanelizerDefaultPanelsStorage extends PanelsStorageBase implements Contain
   public function access($id, $op, AccountInterface $account) {
     list ($entity_type_id, $bundle, $view_mode, $name) = $this->parseId($id);
     if ($panels_display = $this->panelizer->getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode)) {
-      if ($op == 'read' || $this->panelizer->hasDefaultPermission('change content', $entity_type_id, $bundle, $view_mode, $name, $account)) {
+      if ($op == 'change layout') {
+        if ($this->panelizer->hasDefaultPermission('change layout', $entity_type_id, $bundle, $view_mode, $name, $account)) {
+          return AccessResult::allowed();
+        }
+      }
+      else if ($op == 'read' || $this->panelizer->hasDefaultPermission('change content', $entity_type_id, $bundle, $view_mode, $name, $account)) {
         return AccessResult::allowed();
       }
     }

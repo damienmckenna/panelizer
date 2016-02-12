@@ -425,6 +425,7 @@ class Panelizer implements PanelizerInterface {
   protected function getOperations() {
     return [
       'content' => $this->t('Content'),
+      'layout' => $this->t('Layout'),
     ];
   }
 
@@ -484,6 +485,10 @@ class Panelizer implements PanelizerInterface {
     switch ($op) {
       case 'change content':
         return $account->hasPermission("administer panelizer $entity_type_id $bundle content");
+
+      case 'change layout':
+        return $account->hasPermission("administer panelizer $entity_type_id $bundle layout");
+
     }
 
     return FALSE;
