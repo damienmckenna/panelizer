@@ -435,12 +435,13 @@ class Panelizer implements PanelizerInterface {
     $permissions = [];
 
     $definitions = $this->panelizerEntityManager->getDefinitions();
-    foreach ($definitions as $entity_type_id => $entity_type) {
+    foreach (array_keys($definitions) as $entity_type_id) {
+      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
       $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
       foreach ($bundles as $bundle => $bundle_info) {
         $permissions["administer panelizer $entity_type_id $bundle defaults"] = [
           'title' => t('%entity_name %bundle_name: Administer Panelizer default panels, allowed content and settings.', array(
-            '%entity_name' => $entity_type['label'],
+            '%entity_name' => $entity_type->getLabel(),
             '%bundle_name' => $bundle_info['label'],
           )),
           'description' => t('Users with this permission can fully administer panelizer for this entity bundle.'),
@@ -449,7 +450,7 @@ class Panelizer implements PanelizerInterface {
         foreach ($this->getOperations() as $path => $operation) {
           $permissions["administer panelizer $entity_type_id $bundle $path"] = [
             'title' => $this->t('%entity_name %bundle_name: Administer Panelizer @operation', [
-              '%entity_name' => $entity_type['label'],
+              '%entity_name' => $entity_type->getLabel(),
               '%bundle_name' => $bundle_info['label'],
               '@operation' => $operation,
             ]),
