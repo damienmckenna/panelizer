@@ -47,6 +47,10 @@ interface PanelizerInterface {
    *   The name of the default if setting to a default; otherwise NULL.
    * @param \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant|NULL $panels_display
    *   The Panels display if this is an override; otherwise NULL.
+   *
+   * @throws \Drupal\panelizer\Exception\PanelizerException
+   *   When custom overrides aren't enabled on this entity, bundle and view
+   *   mode.
    */
   public function setPanelsDisplay(FieldableEntityInterface $entity, $view_mode, $default, PanelsDisplayVariant $panels_display = NULL);
 
@@ -64,7 +68,7 @@ interface PanelizerInterface {
    *   passed in here so the Panelizer service doesn't have to look it up;
    *   otherwise, this argument can bo omitted.
    *
-   * @return \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant[]|NULL
+   * @return \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant[]
    *   An associative array of Panels displays, keyed by the machine name of
    *   the default if panelized; NULL otherwise. All panelized view modes will
    *   have at least one named 'default'.
@@ -75,7 +79,7 @@ interface PanelizerInterface {
    * Gets one default Panels display for an entity type, bundle and view mode.
    *
    * @param string $name
-   *   The entity type id.
+   *   The name of the default.
    * @param string $entity_type_id
    *   The entity type id.
    * @param string $bundle
@@ -87,18 +91,27 @@ interface PanelizerInterface {
    *   passed in here so the Panelizer service doesn't have to look it up;
    *   otherwise, this argument can bo omitted.
    *
-   * @return \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant
-   *   The default Panels display named 'default'.
+   * @return \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant|NULL
+   *   The default Panels display with the given name if it exists; otherwise
+   *   NULL.
    */
   public function getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode, EntityViewDisplayInterface $display = NULL);
 
   /**
    * @param $name
+   *   The name of the default.
    * @param $entity_type_id
+   *   The entity type id.
    * @param $bundle
+   *   The bundle.
    * @param $view_mode
+   *   The view mode.
    * @param \Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant $panels_display
-   * @return mixed
+   *   The Panels display to use as the default.
+   *
+   * @throws \Drupal\panelizer\Exception\PanelizerException
+   *   When a display can't be found for the given entity type, bundle and view
+   *   mode.
    */
   public function setDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode, PanelsDisplayVariant $panels_display);
 

@@ -20,6 +20,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\panelizer\Exception\PanelizerException;
 use Drupal\panelizer\Plugin\PanelizerEntityManager;
 use Drupal\panels\PanelsDisplayManagerInterface;
 use Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant;
@@ -256,6 +257,9 @@ class Panelizer implements PanelizerInterface {
 
       $entity->save();
     }
+    else {
+      throw new PanelizerException("Custom overrides not enabled on this entity, bundle and view mode");
+    }
   }
 
   /**
@@ -276,7 +280,9 @@ class Panelizer implements PanelizerInterface {
     // Get each one individually.
     $panels_displays = [];
     foreach ($display_names as $name) {
-      $panels_displays[$name] = $this->getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode, $display);
+      if ($panels_display = $this->getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode, $display)) {
+        $panels_displays[$name] = $panels_display;
+      }
     }
 
     return $panels_displays;
@@ -288,6 +294,11 @@ class Panelizer implements PanelizerInterface {
   public function getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode, EntityViewDisplayInterface $display = NULL) {
     if (!$display) {
       $display = $this->getEntityViewDisplay($entity_type_id, $bundle, $view_mode);
+      // If we still don't find a display, then we won't find a Panelizer
+      // default for sure.
+      if (!$display) {
+        return NULL;
+      }
     }
 
     $config = $display->getThirdPartySetting('panelizer', 'displays', []);
@@ -296,8 +307,7 @@ class Panelizer implements PanelizerInterface {
       $panels_display = $this->panelsManager->importDisplay($config[$name], FALSE);
     }
     else {
-      $panels_display = $this->getEntityPlugin($entity_type_id)->getDefaultDisplay($display, $bundle, $view_mode);
-      // @todo: This is actually an appropriate place to set the storage info.
+      return NULL;
     }
 
     // @todo: Should be set when written, not here!
@@ -317,6 +327,9 @@ class Panelizer implements PanelizerInterface {
    */
   public function setDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode, PanelsDisplayVariant $panels_display) {
     $display = $this->getEntityViewDisplay($entity_type_id, $bundle, $view_mode);
+    if (!$display) {
+      throw new PanelizerException("Unable to find display for given entity type, bundle and view mode");
+    }
 
     // Set this individual Panels display.
     $panels_displays = $display->getThirdPartySetting('panelizer', 'displays', []);
