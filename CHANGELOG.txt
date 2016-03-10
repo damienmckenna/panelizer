@@ -76,6 +76,7 @@ By DamienMcKenna: Ensure all ksort() calls only happen on arrays.
 #2579983 by DamienMcKenna: Split up the test file into separate pieces.
 #2589773 by akalam: Revision log field shows when it shouldn't.
 #2579447 by LCM, DamienMcKenna: Added lots of tests for standard node workflows.
+#2579449 by mglaman, DamienMcKenna: Tests for term workflows.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
