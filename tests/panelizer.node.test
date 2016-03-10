@@ -14,8 +14,8 @@ class PanelizerNodeTest extends PanelizerTestHelper {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Panelizer node tests',
-      'description' => 'Test entity bundle configuration settings.',
+      'name' => 'Panelizer node tests (excluding IPE)',
+      'description' => 'Test entity bundle configuration settings, excluding IPE.',
       'group' => 'Panelizer',
       'dependencies' => array('ctools', 'panels'),
     );
