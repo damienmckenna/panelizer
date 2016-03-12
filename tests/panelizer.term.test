@@ -19,7 +19,6 @@ class PanelizerTermTest extends PanelizerTestHelper {
       'name' => 'Panelizer term workflow (excluding IPE)',
       'description' => 'Test the typical workflow of working with terms, excluding IPE.',
       'group' => 'Panelizer',
-      'dependencies' => array('ctools', 'panels', 'taxonomy'),
     );
   }
 
@@ -29,8 +28,16 @@ class PanelizerTermTest extends PanelizerTestHelper {
   function setUp(array $modules = array()) {
     parent::setUp();
 
-    $web_user = $this->drupalCreateUser(array('administer taxonomy', 'administer panelizer'));
-    $this->drupalLogin($web_user);
+    // Create a user with the necessary permissions.
+    $perms = array(
+      // Master permission for all Panelizer operations.
+      'administer panelizer',
+
+      // Full control over this entity.
+      'administer taxonomy',
+    );
+    $admin = $this->drupalCreateUser($perms);
+    $this->drupalLogin($admin);
 
     $edit = array(
       'name' => 'Panelizer Vocabulary',
@@ -64,40 +71,27 @@ class PanelizerTermTest extends PanelizerTestHelper {
   }
 
   /**
-   * Helper function to quickly enable Panelizer for a vocabulary.
-   *
-   * @param $default_status
-   * @param $default_default
-   */
-  protected function enableVocabPanelizer($default_status = 1, $default_default = 0) {
-    variable_set('panelizer_defaults_taxonomy_term_' . $this->vocabulary->machine_name, array(
-      'status' => 1,
-      'help' => '',
-      'view modes' => array(
-        'page_manager' => array(
-          'status' => 0,
-          'substitute' => 0,
-          'default' => 0,
-          'choice' => 0,
-        ),
-        'default' => array(
-          'status' => $default_status,
-          'substitute' => 0,
-          'default' => $default_default,
-          'choice' => 0,
-        ),
-      ),
-    ));
-  }
-
-  /**
    * Test the vocabulary configuration functionality.
    */
   function testVocabularyConfiguration() {
+    // Load the vocabulary's settings page.
+    $this->drupalGet('admin/structure/taxonomy/' . $this->vocabulary->machine_name . '/edit');
+    $this->assertResponse(200);
+
+    // Confirm that the appropriate fields are present.
+    $this->assertFieldByName('panelizer[status]');
+    $this->assertFieldByName('panelizer[help]');
+    foreach (array('page_manager', 'default') as $view_mode) {
+      $this->assertFieldByName('panelizer[view modes][' . $view_mode . '][status]');
+      $this->assertFieldByName('panelizer[view modes][' . $view_mode . '][default]');
+      $this->assertFieldByName('panelizer[view modes][' . $view_mode . '][choice]');
+    }
+
     // Panelize the test vocabulary.
-    $edit = array();
-    $edit['panelizer[status]'] = TRUE;
-    $this->drupalPost('admin/structure/taxonomy/panelizer_vocabulary/edit', $edit, t('Save'));
+    $edit = array(
+      'panelizer[status]' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
     $this->assertResponse(200);
 
     $term = $this->createTestTerm();
@@ -109,9 +103,10 @@ class PanelizerTermTest extends PanelizerTestHelper {
     $this->assertLinkByHref('taxonomy/term/' . $term->tid . '/panelizer', 0, 'A link to customize the node appears on the page');
 
     // Allow panelization of the "Default" view mode.
-    $edit = array();
-    $edit['panelizer[view modes][default][status]'] = TRUE;
-    $edit['panelizer[view modes][default][default]'] = TRUE;
+    $edit = array(
+      'panelizer[view modes][default][status]' => TRUE,
+      'panelizer[view modes][default][default]' => TRUE,
+    );
     $this->drupalPost('admin/structure/taxonomy/panelizer_vocabulary/edit', $edit, t('Save'));
     $this->assertResponse(200);
 
@@ -126,18 +121,20 @@ class PanelizerTermTest extends PanelizerTestHelper {
    *
    */
   function testTermPanelizeIt() {
-    $this->enableVocabPanelizer();
+    $view_mode = 'default';
+    $view_mode_label = t('Default');
+    $this->togglePanelizer('taxonomy_term', $this->vocabulary->machine_name, 1, 0, 0, $view_mode);
     $term = $this->createTestTerm();
 
     // Check that the view mode can be panelized.
     $this->drupalGet('taxonomy/term/' . $term->tid . '/panelizer');
     $this->assertResponse(200);
-    $this->assertText('Default');
-    $this->assertLink('panelize', 0, 'The panelize link for the default view mode appears on the page');
-    $this->assertLinkByHref('taxonomy/term/' . $term->tid . '/panelizer/default', 0, 'A link to panelize the default view mode appears on the page');
+    $this->assertText($view_mode_label);
+    $this->assertLink('panelize', 0, "The panelize link for the {$view_mode} view mode appears on the page.");
+    $this->assertLinkByHref('taxonomy/term/' . $term->tid . '/panelizer/' . $view_mode, 0, "A link to panelize the {$view_mode} view mode appears on the page.");
 
     // Verify that the view mode is not currently panelized.
-    $this->drupalGet('taxonomy/term/' . $term->tid . '/panelizer/default');
+    $this->drupalGet('taxonomy/term/' . $term->tid . '/panelizer/' . $view_mode);
     $this->assertResponse(200);
     $this->assertRaw(t('This %entity is not currently panelized.', array('%entity' => 'Taxonomy term')));
 
@@ -156,17 +153,19 @@ class PanelizerTermTest extends PanelizerTestHelper {
    *
    */
   function testTermPanelsDefault() {
-    $this->enableVocabPanelizer(1, 1);
+    $view_mode = 'default';
+    $this->togglePanelizer('taxonomy_term', $this->vocabulary->machine_name, 1, 1, 0, $view_mode);
     $term = $this->createTestTerm();
 
     // Verify that the view mode has a default panel.
     $this->drupalGet('admin/structure/taxonomy/panelizer_vocabulary/panelizer');
     $this->assertResponse(200);
-    $this->assertLinkByHref('admin/structure/taxonomy/panelizer_vocabulary/panelizer/default', 0, 'User is able to provide default panel for default');
+    $this->assertLinkByHref('admin/structure/taxonomy/panelizer_vocabulary/panelizer/' . $view_mode, 0, 'User is able to provide default panel for ' . $view_mode);
 
-    $edit = array();
-    $edit['layout'] = 'twocol_bricks';
-    $this->drupalPost('admin/structure/taxonomy/panelizer_vocabulary/panelizer/default/layout', $edit, t('Save'));
+    $edit = array(
+      'layout' => 'twocol_bricks',
+    );
+    $this->drupalPost('admin/structure/taxonomy/panelizer_vocabulary/panelizer/' . $view_mode . '/layout', $edit, t('Save'));
 
     // Check that the layout has been set.
     $this->drupalGet('taxonomy/term/' . $term->tid);

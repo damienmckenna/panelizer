@@ -17,7 +17,6 @@ class PanelizerAdminTest extends PanelizerTestHelper {
       'name' => 'Panelizer administration',
       'description' => 'Test panelizer administration page functionality.',
       'group' => 'Panelizer',
-      'dependencies' => array('ctools', 'panels'),
     );
   }
 

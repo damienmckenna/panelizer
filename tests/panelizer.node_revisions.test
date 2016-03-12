@@ -17,7 +17,6 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
       'name' => 'Panelizer node revision tests (excluding IPE)',
       'description' => 'Test panelizer customization in node revisions, excluding IPE.',
       'group' => 'Panelizer',
-      'dependencies' => array('ctools', 'panels'),
     );
   }
 

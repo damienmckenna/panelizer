@@ -20,4 +20,35 @@ class PanelizerTestHelper extends DrupalWebTestCase {
     parent::setUp($modules);
   }
 
+  /**
+   * Helper function to quickly enable or disable Panelizer for an entity type.
+   *
+   * @param string $entity_type
+   *   The entity type to configure
+   * @param string $bundle
+   *   The entity bundle to enable.
+   * @param boolean $status
+   *   Indicate whther the view mode is enabled or disabled.
+   * @param boolean $use_default
+   *   Whether to enable a default display; defaults to FALSE.
+   * @param boolean $choice
+   *   Whether to enable a display choice may be made; defaults to FALSE.
+   * @param string $view_mode
+   *   The entity view mode to be panelized; defaults to 'page_manager'.
+   */
+  protected function togglePanelizer($entity_type, $bundle, $status = 1, $use_default = 0, $choice = 0, $view_mode = 'page_manager') {
+    variable_set('panelizer_defaults_' . $entity_type . '_' . $bundle, array(
+      'status' => 1,
+      'help' => '',
+      'view modes' => array(
+        $view_mode => array(
+          'status' => $status,
+          'substitute' => FALSE,
+          'default' => $use_default,
+          'choice' => $choice,
+        ),
+      ),
+    ));
+  }
+
 }

@@ -25,6 +25,7 @@ files[] = tests/panelizer.admin_settings.test
 files[] = tests/panelizer.node.test
 files[] = tests/panelizer.node_revisions.test
 files[] = tests/panelizer.term.test
+files[] = tests/panelizer.user.test
 
 ; Used by the testing system.
 test_dependencies[] = views

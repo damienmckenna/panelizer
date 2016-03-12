@@ -17,7 +17,6 @@ class PanelizerNodeTest extends PanelizerTestHelper {
       'name' => 'Panelizer node tests (excluding IPE)',
       'description' => 'Test entity bundle configuration settings, excluding IPE.',
       'group' => 'Panelizer',
-      'dependencies' => array('ctools', 'panels'),
     );
   }
 
@@ -38,7 +37,9 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->drupalLogin($web_user);
   }
 
-  /* How to enable a Page Manager Page */
+  /**
+   * How to enable a Page Manager page.
+   */
   function simpleEnablePage($page_name) {
     $page = page_manager_get_page_cache($page_name);
     $function = ctools_plugin_get_function($page->subtask, "enable callback");
@@ -51,16 +52,20 @@ class PanelizerNodeTest extends PanelizerTestHelper {
    */
   function testPageConfiguration() {
     // Panelize "Basic page" content type.
-    $edit = array();
-    $edit['panelizer[status]'] = TRUE;
+    $edit = array(
+      'panelizer[status]' => TRUE,
+    );
     $this->drupalPost('admin/structure/types/manage/page', $edit, t('Save content type'));
 
     // Create a node.
-    $edit = array();
+    $this->drupalGet('node/add/page');
+    $this->assertResponse(200);
     $langcode = LANGUAGE_NONE;
-    $edit["title"] = $this->randomName(8);
-    $edit["body[$langcode][0][value]"] = $this->randomName(16);
-    $this->drupalPost('node/add/page', $edit, t('Save'));
+    $edit = array(
+      'title' => $this->randomName(8),
+      "body[$langcode][0][value]" => $this->randomName(16),
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
 
     // Check that the post has been panelized.
     $node = $this->drupalGetNodeByTitle($edit["title"]);
@@ -68,9 +73,12 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->assertLinkByHref('node/' . $node->nid . '/panelizer', 0, 'A link to customize the node appears on the page');
 
     // Allow panelization of the "Default" view mode.
-    $edit = array();
-    $edit['panelizer[view modes][default][status]'] = TRUE;
-    $this->drupalPost('admin/structure/types/manage/page', $edit, t('Save content type'));
+    $this->drupalGet('admin/structure/types/manage/page');
+    $this->assertResponse(200);
+    $edit = array(
+      'panelizer[view modes][default][status]' => TRUE,
+    );
+    $this->drupalPost(NULL, $edit, t('Save content type'));
 
     // Check that the view mode can be panelized.
     $this->drupalGet('node/' . $node->nid . '/panelizer');
@@ -100,15 +108,16 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     // Ensure node_view panel page is enabled for full page override to work.
     $this->simpleEnablePage('node_view');
 
-    $edit = array();
-    $edit['panelizer[status]'] = TRUE;
-    // Enable the 'Full page override' view mode, which is managed by Page
-    // Manager.
-    $edit['panelizer[view modes][page_manager][status]'] = TRUE;
-    // Provide a default display.
-    $edit['panelizer[view modes][page_manager][default]'] = TRUE;
-    // Allow a specific display to be selected per node.
-    $edit['panelizer[view modes][page_manager][choice]'] = TRUE;
+    $edit = array(
+      'panelizer[status]' => TRUE,
+      // Enable the 'Full page override' view mode, which is managed by Page
+      // Manager.
+      'panelizer[view modes][page_manager][status]' => TRUE,
+      // Provide a default display.
+      'panelizer[view modes][page_manager][default]' => TRUE,
+      // Allow a specific display to be selected per node.
+      'panelizer[view modes][page_manager][choice]' => TRUE,
+    );
     $this->drupalPost('admin/structure/types/manage/page', $edit, t('Save content type'));
     $this->assertResponse(200);
 
@@ -143,11 +152,12 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->assertField('panelizer[page_manager][name]');
 
     // Create a node with cloned display mode.
-    $edit = array();
     $langcode = LANGUAGE_NONE;
-    $edit["title"] = $this->randomName(8);
-    $edit["body[$langcode][0][value]"] = $this->randomName(16);
-    $edit["panelizer[page_manager][name]"] = "node:page:clone_of_default";
+    $edit = array(
+      'title' => $this->randomName(8),
+      "body[$langcode][0][value]" => $this->randomName(16),
+      'panelizer[page_manager][name]' => 'node:page:clone_of_default',
+    );
     $this->drupalPost('node/add/page', $edit, t('Save'));
     $this->assertResponse(200);
 
