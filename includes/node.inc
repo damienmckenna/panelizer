@@ -361,6 +361,7 @@ function panelizer_edit_node_content_page($node) {
         unset($panelizer->display);
       }
 
+      $panelizer->new = FALSE;
       panelizer_save_node_panelizer($panelizer);
     }
     panels_edit_cache_clear($cache);
