@@ -2349,8 +2349,9 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
     $output = drupal_build_form($form_id, $form_state);
     if (!empty($form_state['executed'])) {
       $entity->panelizer[$view_mode] = $form_state['panelizer'];
-      // Make sure that entity_save knows that the panelizer settings
-      // are modified and must be made local to the entity.
+
+      // Make sure that entity_save knows that the panelizer settings are
+      // modified and must be made local to the entity.
       if (empty($panelizer->did) || !empty($panelizer->name)) {
         $panelizer->display_is_modified = TRUE;
       }
@@ -2360,6 +2361,7 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
 
       drupal_set_message(t('The settings have been updated.'));
 
+      // Redirect.
       drupal_goto($_GET['q']);
     }
 
@@ -2389,15 +2391,27 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
     $output = drupal_build_form('panelizer_default_context_form', $form_state);
     if (!empty($form_state['executed'])) {
       if (!empty($form_state['clicked_button']['#write'])) {
-        drupal_set_message(t('The settings have been updated.'));
         $entity->panelizer[$view_mode] = $form_state['panelizer'];
+
+        // Make sure that entity_save knows that the panelizer settings are
+        // modified and must be made local to the entity.
+        if (empty($panelizer->did) || !empty($panelizer->name)) {
+          $panelizer->display_is_modified = TRUE;
+        }
+
+        // Update the entity.
         $this->entity_save($entity);
+
+        drupal_set_message(t('The settings have been updated.'));
       }
       else {
         drupal_set_message(t('Changes have been discarded.'));
       }
 
+      // Clear the context cache.
       panelizer_context_cache_clear($this->entity_type, $cache_key);
+
+      // Redirect.
       drupal_goto($_GET['q']);
     }
 
