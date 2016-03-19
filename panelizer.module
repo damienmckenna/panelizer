@@ -12,7 +12,10 @@
  * Implementation of hook_perm().
  */
 function panelizer_perm() {
-  return array('administer panelizer');
+  return array(
+    'administer panelizer',
+    'use panelizer',
+  );
 }
 
 /**
@@ -202,7 +205,10 @@ function panelizer_menu() {
  * Determine if the current user has access to edit panelizer info on a node.
  */
 function panelizer_edit_node_callback($node, $check_for_default = TRUE) {
-  if (!panelizer_is_panelized('node', $node->type)) {
+  if (
+    !user_access('use panelizer')
+    || !panelizer_is_panelized('node', $node->type)
+  ) {
     return FALSE;
   }
 
