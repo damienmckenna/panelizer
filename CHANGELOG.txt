@@ -80,6 +80,7 @@ By DamienMcKenna: Ensure all ksort() calls only happen on arrays.
 #2579451 by DamienMcKenna: Added tests for user workflows.
 #2690267 by greenSkin: Rewrote update 7106 to work around API limitations.
 #2537328 by B-Prod: Context changes weren't clearing the correct caches.
+By DamienMcKenna: Properly formatted all comments in the main module file.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
