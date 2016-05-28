@@ -8,23 +8,26 @@
  * Implements hook_schema().
  */
 function panelizer_schema() {
-  // This should always point to our 'current' schema. This makes it
-  // relatively easy to keep a record of schema as we make changes to it.
-  return panelizer_schema_4();
-}
-
-/**
- * Schema version 1 for Panels in D6.
- */
-function panelizer_schema_1() {
   $schema = array();
 
+  // Fields that are shared between the two tables.
   $common_fields = array(
-    'no_blocks' => array(
+    'view_mode' => array(
+      'type' => 'varchar',
+      'length' => '128',
+      'description' => 'Contains the view mode this panelizer is for.',
+      'not null' => TRUE,
+    ),
+    'did' => array(
       'type' => 'int',
-      'size' => 'tiny',
-      'description' => 'Whether or not the node disable sidebar blocks.',
-      'default' => 0,
+      'not null' => TRUE,
+      'description' => 'The display ID of the panel.',
+      'no export' => TRUE,
+    ),
+    'name' => array(
+      'type' => 'varchar',
+      'length' => '255',
+      'description' => 'The name of the default being used if there is one.',
     ),
     'css_id' => array(
       'type' => 'varchar',
@@ -32,11 +35,42 @@ function panelizer_schema_1() {
       'description' => 'The CSS ID this panel should use.',
       'default' => '',
     ),
+    'css_class' => array(
+      'type' => 'varchar',
+      'length' => '255',
+      'description' => 'The CSS class this panel should use.',
+      'default' => '',
+    ),
     'css' => array(
       'type' => 'text',
       'size' => 'big',
       'description' => 'Any CSS the author provided for the panel.',
       'object default' => '',
+    ),
+    'no_blocks' => array(
+      'type' => 'int',
+      'size' => 'tiny',
+      'description' => 'Whether or not the node disable sidebar blocks.',
+      'default' => 0,
+    ),
+    'title_element' => array(
+      'type' => 'varchar',
+      'length' => '255',
+      'description' => 'The HTML element the title should use.',
+      'default' => 'H2',
+    ),
+    'link_to_entity' => array(
+      'type' => 'int',
+      'size' => 'tiny',
+      'description' => 'Whether or not the title should link to the entity.',
+      'default' => 1,
+    ),
+    'extra' => array(
+      'type' => 'text',
+      'size' => 'big',
+      'description' => 'Contains extra data that can be added by modules.',
+      'serialize' => TRUE,
+      'object default' => array(),
     ),
     'pipeline' => array(
       'type' => 'varchar',
@@ -57,12 +91,6 @@ function panelizer_schema_1() {
       'description' => 'The relationship contexts configured by the node author.',
       'serialize' => TRUE,
       'object default' => array(),
-    ),
-    'did' => array(
-      'type' => 'int',
-      'not null' => TRUE,
-      'description' => 'The display ID of the panel.',
-      'no export' => TRUE,
     ),
   );
 
@@ -92,14 +120,10 @@ function panelizer_schema_1() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'name' => array(
-        'type' => 'varchar',
-        'length' => '255',
-        'description' => 'The name of the default being used if there is one.',
-      ),
     ) + $common_fields,
     'primary key' => array('entity_type', 'entity_id', 'revision_id', 'view_mode'),
   );
+
 
   $schema['panelizer_defaults'] = array(
     'description' => 'Node type panelizer references.',
@@ -129,11 +153,6 @@ function panelizer_schema_1() {
         'no export' => TRUE,
         'not null' => TRUE,
       ),
-      'name' => array(
-        'type' => 'varchar',
-        'length' => '255',
-        'description' => 'The unique name of this default.',
-      ),
       'title' => array(
         'type' => 'varchar',
         'length' => '255',
@@ -149,6 +168,13 @@ function panelizer_schema_1() {
         'length' => '128',
         'description' => 'The panelizer entity bundle.',
       ),
+      'access' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Contains the access control for editing this default.',
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
     ) + $common_fields,
     'primary key' => array('pnid'),
     'indexes' => array(
@@ -156,101 +182,6 @@ function panelizer_schema_1() {
       'type_key' => array('panelizer_type', 'panelizer_key'),
     ),
   );
-
-  return $schema;
-}
-
-function panelizer_schema_2() {
-  $schema = panelizer_schema_1();
-  $schema['panelizer_defaults']['fields']['access'] = array(
-    'type' => 'text',
-    'size' => 'big',
-    'description' => 'Contains the access control for editing this default.',
-    'serialize' => TRUE,
-    'object default' => array(),
-  );
-
-  $schema['panelizer_defaults']['fields']['view_mode'] = array(
-    'type' => 'varchar',
-    'length' => '128',
-    'description' => 'Contains the view mode this panelizer is for.',
-  );
-
-  $schema['panelizer_entity']['fields']['view_mode'] = array(
-    'type' => 'varchar',
-    'length' => '128',
-    'description' => 'Contains the view mode this panelizer is for.',
-  );
-
-  $schema['panelizer_entity']['fields']['css_class'] = array(
-    'type' => 'varchar',
-    'length' => '255',
-    'description' => 'The CSS class this panel should use.',
-    'default' => '',
-  );
-
-  $schema['panelizer_defaults']['fields']['css_class'] = array(
-    'type' => 'varchar',
-    'length' => '255',
-    'description' => 'The CSS class this panel should use.',
-    'default' => '',
-  );
-
-  $schema['panelizer_entity']['fields']['title_element'] = array(
-    'type' => 'varchar',
-    'length' => '255',
-    'description' => 'The HTML element the title should use.',
-    'default' => 'H2',
-  );
-
-  $schema['panelizer_defaults']['fields']['title_element'] = array(
-    'type' => 'varchar',
-    'length' => '255',
-    'description' => 'The HTML element the title should use.',
-    'default' => 'H2',
-  );
-
-  $schema['panelizer_entity']['fields']['link_to_entity'] = array(
-    'type' => 'int',
-    'size' => 'tiny',
-    'description' => 'Whether or not the title should link to the entity.',
-    'default' => 1,
-  );
-
-  $schema['panelizer_defaults']['fields']['link_to_entity'] = array(
-    'type' => 'int',
-    'size' => 'tiny',
-    'description' => 'Whether or not the title should link to the entity.',
-    'default' => 1,
-  );
-
-  return $schema;
-}
-
-function panelizer_schema_3() {
-  $schema = panelizer_schema_2();
-  $schema['panelizer_defaults']['fields']['extra'] = array(
-    'type' => 'text',
-    'size' => 'big',
-    'description' => 'Contains extra data that can be added by modules.',
-    'serialize' => TRUE,
-    'object default' => array(),
-  );
-
-  $schema['panelizer_entity']['fields']['extra'] = array(
-    'type' => 'text',
-    'size' => 'big',
-    'description' => 'Contains extra data that can be added by modules.',
-    'serialize' => TRUE,
-    'object default' => array(),
-  );
-
-  return $schema;
-}
-
-function panelizer_schema_4() {
-  $schema = panelizer_schema_3();
-  $schema['panelizer_entity']['fields']['view_mode']['not null'] = TRUE;
 
   return $schema;
 }
@@ -456,23 +387,21 @@ function panelizer_update_7101() {
   db_drop_primary_key('panelizer_entity');
 
   // Add the entity type.
-  $entity_type = array(
+  $spec = array(
     'description' => 'The type of the entity this panel is attached to.',
     'type' => 'varchar',
     'length' => 255,
   );
-
-  db_add_field('panelizer_entity', 'entity_type', $entity_type);
+  db_add_field('panelizer_entity', 'entity_type', $spec);
 
   // Rename nid to entity_id.
-  $entity_id = array(
+  $spec = array(
     'type' => 'int',
     'not null' => TRUE,
     'default' => 0,
     'description' => 'The entity ID this panel is attached to.',
   );
-
-  db_change_field('panelizer_entity', 'nid', 'entity_id', $entity_id);
+  db_change_field('panelizer_entity', 'nid', 'entity_id', $spec);
 
   // Update the entity_type field to 'node' since all pre-existing
   // panelizer objects are nodes.
@@ -491,18 +420,17 @@ function panelizer_update_7102() {
   // Remove the primary key.
   db_drop_primary_key('panelizer_entity');
 
-  // Add the entity type.
-  $revision_id = array(
+  // Add the revision ID field.
+  $spec = array(
     'description' => 'The revision id of the entity.',
     'type' => 'int',
     'unsigned' => TRUE,
   );
-
-  db_add_field('panelizer_entity', 'revision_id', $revision_id);
+  db_add_field('panelizer_entity', 'revision_id', $spec);
 
   db_query("UPDATE {panelizer_entity} pe LEFT JOIN {node} n ON pe.entity_id = n.nid SET pe.revision_id = n.vid");
 
-  // Add the new index
+  // Add the new index.
   db_add_primary_key('panelizer_entity', array('entity_type', 'entity_id', 'revision_id'));
 
   return t('Added revision support.');
@@ -512,31 +440,57 @@ function panelizer_update_7102() {
  * Set primary keys to NOT NULL.
  */
 function panelizer_update_7103() {
-  $schema = panelizer_schema_1();
+  $spec = array(
+    'description' => 'The type of the entity this panel is attached to.',
+    'type' => 'varchar',
+    'length' => 128,
+    'not null' => TRUE,
+  );
+  db_change_field('panelizer_entity', 'entity_type', 'entity_type', $spec);
 
-  db_change_field('panelizer_entity', 'entity_type', 'entity_type', $schema['panelizer_entity']['fields']['entity_type']);
-  db_change_field('panelizer_entity', 'revision_id', 'revision_id', $schema['panelizer_entity']['fields']['revision_id']);
-  db_change_field('panelizer_defaults', 'pnid', 'pnid', $schema['panelizer_defaults']['fields']['pnid']);
+  $spec = array(
+    'description' => 'The revision id of the entity.',
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+  );
+  db_change_field('panelizer_entity', 'revision_id', 'revision_id', $spec);
+
+  $spec = array(
+    'type' => 'serial',
+    'description' => 'The database primary key.',
+    'no export' => TRUE,
+    'not null' => TRUE,
+  );
+  db_change_field('panelizer_defaults', 'pnid', 'pnid', $spec);
 }
 
 /**
- * Add the access field.
+ * Add the {panelizer_defaults}.access field.
  */
 function panelizer_update_7104() {
-  $schema = panelizer_schema_2();
-  $access = $schema['panelizer_defaults']['fields']['access'];
-  db_add_field('panelizer_defaults', 'access', $access);
+  $spec = array(
+    'type' => 'text',
+    'size' => 'big',
+    'description' => 'Contains the access control for editing this default.',
+    'serialize' => TRUE,
+    'object default' => array(),
+  );
+  db_add_field('panelizer_defaults', 'access', $spec);
 }
 
 /**
  * Add the view mode field.
  */
 function panelizer_update_7105() {
-  $schema = panelizer_schema_2();
-  $view_mode = $schema['panelizer_defaults']['fields']['view_mode'];
-  db_add_field('panelizer_defaults', 'view_mode', $view_mode);
-  $view_mode = $schema['panelizer_entity']['fields']['view_mode'];
-  db_add_field('panelizer_entity', 'view_mode', $view_mode);
+  $spec = array(
+    'type' => 'varchar',
+    'length' => '128',
+    'description' => 'Contains the view mode this panelizer is for.',
+    'not null' => TRUE,
+  );
+  db_add_field('panelizer_defaults', 'view_mode', $spec);
+  db_add_field('panelizer_entity', 'view_mode', $spec);
 
   db_update('panelizer_defaults')
     ->fields(array(
@@ -581,38 +535,52 @@ function panelizer_update_7106() {
  * Add the css class and element title fields.
  */
 function panelizer_update_7107() {
-  $schema = panelizer_schema_2();
-  $css_class = $schema['panelizer_defaults']['fields']['css_class'];
-  db_add_field('panelizer_defaults', 'css_class', $css_class);
-  $css_class = $schema['panelizer_entity']['fields']['css_class'];
-  db_add_field('panelizer_entity', 'css_class', $css_class);
+  $spec = array(
+    'type' => 'varchar',
+    'length' => '255',
+    'description' => 'The CSS class this panel should use.',
+    'default' => '',
+  );
+  db_add_field('panelizer_defaults', 'css_class', $spec);
+  db_add_field('panelizer_entity', 'css_class', $spec);
 
-  $title_element = $schema['panelizer_defaults']['fields']['title_element'];
-  db_add_field('panelizer_defaults', 'title_element', $title_element);
-  $title_element = $schema['panelizer_entity']['fields']['title_element'];
-  db_add_field('panelizer_entity', 'title_element', $title_element);
+  $spec = array(
+    'type' => 'varchar',
+    'length' => '255',
+    'description' => 'The HTML element the title should use.',
+    'default' => 'H2',
+  );
+  db_add_field('panelizer_defaults', 'title_element', $spec);
+  db_add_field('panelizer_entity', 'title_element', $spec);
 }
 
 /**
  * Add the link_to_entity field
  */
 function panelizer_update_7108() {
-  $schema = panelizer_schema_2();
-  $link_to_entity = $schema['panelizer_defaults']['fields']['link_to_entity'];
-  db_add_field('panelizer_defaults', 'link_to_entity', $link_to_entity);
-  $link_to_entity = $schema['panelizer_entity']['fields']['link_to_entity'];
-  db_add_field('panelizer_entity', 'link_to_entity', $link_to_entity);
+  $spec = array(
+    'type' => 'int',
+    'size' => 'tiny',
+    'description' => 'Whether or not the title should link to the entity.',
+    'default' => 1,
+  );
+  db_add_field('panelizer_defaults', 'link_to_entity', $spec);
+  db_add_field('panelizer_entity', 'link_to_entity', $spec);
 }
 
 /**
  * Add the extra field so that modules can extend panelizer more easily.
  */
 function panelizer_update_7109() {
-  $schema = panelizer_schema_3();
-  $extra = $schema['panelizer_defaults']['fields']['extra'];
-  db_add_field('panelizer_defaults', 'extra', $extra);
-  $extra = $schema['panelizer_entity']['fields']['extra'];
-  db_add_field('panelizer_entity', 'extra', $extra);
+  $spec = array(
+    'type' => 'text',
+    'size' => 'big',
+    'description' => 'Contains extra data that can be added by modules.',
+    'serialize' => TRUE,
+    'object default' => array(),
+  );
+  db_add_field('panelizer_defaults', 'extra', $spec);
+  db_add_field('panelizer_entity', 'extra', $spec);
 }
 
 /**
@@ -620,15 +588,16 @@ function panelizer_update_7109() {
  */
 function panelizer_update_7110() {
   db_drop_primary_key('panelizer_entity');
-  db_change_field('panelizer_entity', 'entity_type', 'entity_type',
-    array(
-      'description' => 'The type of the entity this panel is attached to.',
-      'type' => 'varchar',
-      'length' => 128,
-      'not null' => TRUE,
-    ),
-    array('primary key' => array('entity_type', 'entity_id', 'revision_id', 'view_mode'))
+  $spec = array(
+    'description' => 'The type of the entity this panel is attached to.',
+    'type' => 'varchar',
+    'length' => 128,
+    'not null' => TRUE,
   );
+  $keys = array(
+    'primary key' => array('entity_type', 'entity_id', 'revision_id', 'view_mode'),
+  );
+  db_change_field('panelizer_entity', 'entity_type', 'entity_type', $spec, $keys);
 }
 
 /**
@@ -670,15 +639,17 @@ function panelizer_update_7112() {
  */
 function panelizer_update_7113() {
   db_drop_primary_key('panelizer_entity');
-  db_change_field('panelizer_entity', 'view_mode', 'view_mode',
-    array(
-      'description' => 'Contains the view mode this panelizer is for.',
-      'type' => 'varchar',
-      'length' => '128',
-      'not null' => TRUE,
-    ),
-    array('primary key' => array('entity_type', 'entity_id', 'revision_id', 'view_mode'))
+
+  $spec = array(
+    'description' => 'Contains the view mode this panelizer is for.',
+    'type' => 'varchar',
+    'length' => '128',
+    'not null' => TRUE,
   );
+  $keys = array('primary key' =>
+    array('entity_type', 'entity_id', 'revision_id', 'view_mode'),
+  );
+  db_change_field('panelizer_entity', 'view_mode', 'view_mode', $spec, $keys);
 }
 
 /**
