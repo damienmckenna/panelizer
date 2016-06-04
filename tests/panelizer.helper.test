@@ -49,6 +49,111 @@ class PanelizerTestHelper extends DrupalWebTestCase {
         ),
       ),
     ));
+
+    // Update the handler's plugin definition. Because of the way Panelizer is
+    // caching the handler objects, the entity node handler has already been
+    // loaded and has already identified what bundles are configured for this
+    // page execution. In order to work around that, so that
+    // hook_entity_update() can be called, need to reload the handler and rejig
+    // the plugin defintion.
+    ctools_include('plugins');
+    ctools_plugin_get_plugin_type_info(TRUE);
+    $handler = panelizer_entity_plugin_get_handler($entity_type);
+    $plugin = panelizer_get_entity_plugin($entity_type);
+    $info = ctools_plugin_get_info('panelizer', 'entity');
+    panelizer_entity_plugin_process($plugin, $info);
+    $handler->plugin = $plugin;
+    $this->verbose(print_r($handler, TRUE));
+    $this->assertTrue($handler->is_panelized($bundle), 'Entity bundle is panelized.');
+    return $handler;
+  }
+
+  /**
+   * Enable a Page Manager page handler.
+   *
+   * @param string $page_name
+   *   The Page Manager page handler that needs to be enabled.
+   */
+  function simpleEnablePage($page_name) {
+    $page = page_manager_get_page_cache($page_name);
+    $function = ctools_plugin_get_function($page->subtask, 'enable callback');
+    $function($page, FALSE);
+    menu_rebuild();
+  }
+
+  /**
+   * Get the default Panelizer display for a specific entity bundle.
+   *
+   * @param string $entity_type
+   * @param string $bundle
+   * @param string $view_mode
+   */
+  function getDefaultPanelizerDisplay($entity_type, $bundle, $view_mode) {
+    $handler = panelizer_entity_plugin_get_handler($entity_type);
+    $this->verbose(print_r($handler, TRUE));
+    $this->assertTrue($handler->is_panelized($bundle), 'Entity bundle is panelized.');
+    return $handler->get_default_display($bundle, $view_mode);
+  }
+
+  /**
+   * Add a custom text pane to a display.
+   */
+  function addTestPane(&$display, $text = 'Hello world') {
+    $custom = ctools_get_content_type('custom');
+
+    // Create a basic 'custom' pane.
+    $pane = panels_new_pane('custom', 'custom');
+    $pane->configuration = ctools_content_get_defaults($custom, 'custom');
+    $pane->configuration['title'] = 'test';
+    $pane->configuration['body'] = $text;
+
+    // Add the pane to the display.
+    $display->add_pane($pane, 'center');
+  }
+
+  /**
+   * Enable some extra languages.
+   */
+  function setupLocales() {
+    // Add French.
+    $this->addSiteLanguage('fr');
+
+    // Add Spanish.
+    $this->addSiteLanguage('es');
+
+    // Enable URL language detection and selection.
+    $edit = array('language[enabled][locale-url]' => '1');
+    $this->drupalPost('admin/config/regional/language/configure', $edit, t('Save settings'));
+    $this->assertResponse(200);
+  }
+
+  /**
+   * Add a locale to the site.
+   *
+   * This assumes the Locale module is enabled.
+   */
+  public function addSiteLanguage($langcode) {
+    // Load the language-add page.
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->assertResponse(200, 'Loaded the language-add admin page.');
+
+    // Submit the language-add form.
+    $args = array(
+      'langcode' => $langcode,
+    );
+    $this->drupalPost(NULL, $args, t('Add language'));
+    $this->assertResponse(200);
+
+    // Verify that the browser was returned to the main languages admin page.
+    $this->assertEqual($this->getUrl(), url('admin/config/regional/language', array('absolute' => TRUE)), 'Redirected back to the main languages admin page.');
+
+    // Clear the language list cache so it can be reloaded.
+    drupal_static_reset('language_list');
+
+    // Get all language definitions.
+    $languages = language_list();
+    $language = $languages[$langcode]->name;
+    $this->assertText(strip_tags(t('The language %language has been created and can now be used. More information is available on the <a href="@locale-help">help screen</a>.', array('%language' => t($language), '@locale-help' => url('admin/help/locale')))), 'A new language has been added.');
   }
 
 }

@@ -38,16 +38,6 @@ class PanelizerNodeTest extends PanelizerTestHelper {
   }
 
   /**
-   * How to enable a Page Manager page.
-   */
-  function simpleEnablePage($page_name) {
-    $page = page_manager_get_page_cache($page_name);
-    $function = ctools_plugin_get_function($page->subtask, "enable callback");
-    $function($page, FALSE);
-    menu_rebuild();
-  }
-
-  /**
    * Verify that the "Basic page" content type can be panelized.
    */
   function testPageConfiguration() {

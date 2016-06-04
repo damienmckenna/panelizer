@@ -27,5 +27,8 @@ files[] = tests/panelizer.node_revisions.test
 files[] = tests/panelizer.term.test
 files[] = tests/panelizer.user.test
 
+; i18n & translations.
+files[] = tests/panelizer.content_translation.test
+
 ; Used by the testing system.
 test_dependencies[] = views

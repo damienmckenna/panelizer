@@ -1568,6 +1568,12 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
       return;
     }
 
+    // Check to see if this entity is a translation of another entity.
+    // If so, use the source entity's panelizer information to clone it.
+    if (isset($entity->translation_source) && isset($entity->translation_source->panelizer)) {
+      $entity->panelizer = $entity->translation_source->panelizer;
+    }
+
     // If there's no panelizer information on the entity then there is nothing to do.
     if (empty($entity->panelizer)) {
       return;
@@ -1741,7 +1747,7 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
           $panelizer->display->cache_key = implode(':', array_filter(array('panelizer', $panelizer->entity_type, $panelizer->entity_id, $view_mode, $revision_id)));
         }
 
-        // First write the display
+        // First write the display.
         panels_save_display($panelizer->display);
 
         // Make sure we have the did.
