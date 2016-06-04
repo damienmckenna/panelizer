@@ -7,7 +7,7 @@
 /**
  *
  */
-class PanelizerContentTranslationTest extends PanelizerTestHelper {
+class PanelizerNodeContentTranslationTest extends PanelizerTestHelper {
 
   /**
    * {@inheritdoc}

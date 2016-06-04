@@ -19,16 +19,17 @@ files[] = plugins/views/panelizer_handler_panelizer_status.inc
 files[] = plugins/views/panelizer_handler_filter_panelizer_status.inc
 files[] = plugins/views/panelizer_plugin_row_panelizer_node_view.inc
 
-; Tests.
+; Tests: Basic functionality using core.
 files[] = tests/panelizer.helper.test
 files[] = tests/panelizer.admin_settings.test
+
+; Tests: Standard core entities.
 files[] = tests/panelizer.node.test
-files[] = tests/panelizer.node_revisions.test
 files[] = tests/panelizer.term.test
 files[] = tests/panelizer.user.test
 
-; i18n & translations.
-files[] = tests/panelizer.content_translation.test
+; Tests: Node workflows.
+files[] = tests/panelizer.node_revisions.test
 
-; Used by the testing system.
-test_dependencies[] = views
+; Tests: Standard node translations.
+files[] = tests/panelizer.node_content_translation.test
