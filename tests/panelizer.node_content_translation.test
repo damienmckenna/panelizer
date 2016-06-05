@@ -14,7 +14,7 @@ class PanelizerNodeContentTranslationTest extends PanelizerTestHelper {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Panelizer w Content Translation',
+      'name' => 'Panelizer node translations',
       'description' => 'Test node translations using Content Translation.',
       'group' => 'Panelizer',
     );

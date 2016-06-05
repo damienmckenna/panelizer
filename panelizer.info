@@ -33,3 +33,19 @@ files[] = tests/panelizer.node_revisions.test
 
 ; Tests: Standard node translations.
 files[] = tests/panelizer.node_content_translation.test
+
+; Todo: Tests: Pathauto integration.
+test_dependencies[] = pathauto
+files[] = tests/panelizer.with_pathauto.test
+
+; Todo: Tests: Revisioning integration.
+test_dependencies[] = revisioning
+files[] = tests/panelizer.with_revisioning.test
+
+; Todo: Tests: Views integration.
+test_dependencies[] = views
+files[] = tests/panelizer.with_views.test
+
+; Todo: Tests: Workbench Moderation integration.
+test_dependencies[] = workbench_moderation (>= 3.x)
+files[] = tests/panelizer.with_workbench_moderation.test

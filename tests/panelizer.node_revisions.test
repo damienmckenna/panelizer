@@ -14,7 +14,7 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Panelizer node revision tests (excluding IPE)',
+      'name' => 'Panelizer node revisions (excluding IPE)',
       'description' => 'Test panelizer customization in node revisions, excluding IPE.',
       'group' => 'Panelizer',
     );
@@ -39,9 +39,10 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
   }
 
   /**
-   * Tests different displays for different node revisions
+   * Confirm that saving new node revisions will create a new {panelizer_entity}
+   * record.
    */
-  function testPageAlterDisplayOnNewRevision() {
+  function testNewRevision() {
     // Panelize "Basic page" content type and the 'default' display.
     $edit = array();
     $edit['panelizer[status]'] = TRUE;
@@ -181,6 +182,22 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
     $this->assertEqual(count($elements), 0, 'The node revision is NOT using the clone of cloned display.');
     $elements = $this->xpath('//div[contains(@class,:class)]', array(':class' => $clone_css_class));
     $this->assertEqual(count($elements), 1, 'The node revision is using the default display.');
+  }
+
+  /**
+   * Confirm that deleting a node revision will only delete the appropriate
+   * {panelizer_entity} record.
+   */
+  function testDeletingRevision() {
+    // @todo.
+  }
+
+  /**
+   * Confirm that reverting to a specific revision will create the appropriate
+   * {panelizer_entity} record.
+   */
+  function testRevertingRevision() {
+    // @todo.
   }
 
 }

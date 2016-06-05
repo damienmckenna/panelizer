@@ -1,0 +1,51 @@
+<?php
+/**
+ * @file
+ * Test the Pathauto integration for Panelizer.
+ */
+
+/**
+ *
+ */
+class PanelizerWithPathautoTest extends PanelizerTestHelper {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Panelizer w Pathauto',
+      'description' => 'Test Pathauto integration.',
+      'group' => 'Panelizer',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setUp(array $modules = array()) {
+    $modules[] = 'pathauto';
+    parent::setUp($modules);
+
+    $perms = array(
+      // Standard node permissions.
+      'create page content',
+      'administer content types',
+      'administer nodes',
+      'bypass node access',
+
+      // Panelizer.
+      'administer panelizer',
+    );
+    $web_user = $this->drupalCreateUser($perms);
+    $this->drupalLogin($web_user);
+  }
+
+  /**
+   * Confirm that saving the Panelizer page doesn't remove the Pathauto alias.
+   */
+  function testSaveDisplay() {
+    // @todo
+  }
+
+}
