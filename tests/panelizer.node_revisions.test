@@ -283,6 +283,16 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
     // add a default class.
     $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => $css_default_class));
     $this->assertEqual(count($elements), 1, 'The node is using the default display again.');
+
+    // Confirm the new display is the same as the old display.
+    $new_display = NULL;
+    foreach ($records as $record) {
+      if ($record->revision_id == $node_revision->vid) {
+        $new_display = $record->name;
+        break;
+      }
+    }
+    $this->assertEqual($new_display, 'node:page:default');
   }
 
 }

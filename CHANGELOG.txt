@@ -87,6 +87,8 @@ By DamienMcKenna: Properly formatted all comments in the main module file.
   translate a panelized node, clone the Panelizer configuration.
 #2742601 by DamienMcKenna: Preparation for adding more tests.
 #2742609 by DamienMcKenna: Added tests for core node revision handling.
+#2715573 by DamienMcKenna: Tests to confirm reverting a revision works as
+  intended.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
