@@ -41,43 +41,54 @@ class PanelizerNodeTest extends PanelizerTestHelper {
    * Verify that the "Basic page" content type can be panelized.
    */
   function testPageConfiguration() {
+    $content_type = 'page';
+    $view_mode = 'default';
+
     // Panelize "Basic page" content type.
     $edit = array(
       'panelizer[status]' => TRUE,
     );
-    $this->drupalPost('admin/structure/types/manage/page', $edit, t('Save content type'));
+    $this->drupalPost('admin/structure/types/manage/' . $content_type, $edit, t('Save content type'));
 
-    // Create a node.
-    $this->drupalGet('node/add/page');
-    $this->assertResponse(200);
-    $langcode = LANGUAGE_NONE;
-    $edit = array(
-      'title' => $this->randomName(8),
-      "body[$langcode][0][value]" => $this->randomName(16),
-    );
-    $this->drupalPost(NULL, $edit, t('Save'));
+    // Create a test node.
+    $node = $this->createNode();
 
     // Check that the post has been panelized.
-    $node = $this->drupalGetNodeByTitle($edit["title"]);
+    $this->drupalGet('node/' . $node->nid);
     $this->assertLink('Customize display', 0, 'The customize display link appears on the page');
     $this->assertLinkByHref('node/' . $node->nid . '/panelizer', 0, 'A link to customize the node appears on the page');
 
     // Allow panelization of the "Default" view mode.
-    $this->drupalGet('admin/structure/types/manage/page');
+    $this->drupalGet('admin/structure/types/manage/' . $content_type);
     $this->assertResponse(200);
     $edit = array(
-      'panelizer[view modes][default][status]' => TRUE,
+      'panelizer[view modes][' . $view_mode . '][status]' => TRUE,
     );
     $this->drupalPost(NULL, $edit, t('Save content type'));
+
+    // Confirm the behavior of Panelizer when there is no default display
+    // available.
+    $paths = array(
+      $view_mode,
+      $view_mode . '/settings',
+      $view_mode . '/context',
+      $view_mode . '/layout',
+      $view_mode . '/content',
+    );
+    foreach ($paths as $path) {
+      $this->drupalGet('admin/structure/types/manage/' . $content_type . '/panelizer/' . $path);
+      $this->assertResponse(200);
+      $this->assertText(t('No default display has been configured for this view mode.'));
+    }
 
     // Check that the view mode can be panelized.
     $this->drupalGet('node/' . $node->nid . '/panelizer');
     $this->assertText('Default');
-    $this->assertLink('panelize', 0, 'The panelize link for the default view mode appears on the page');
-    $this->assertLinkByHref('node/' . $node->nid . '/panelizer/default', 0, 'A link to panelize the default view mode appears on the page');
+    $this->assertLink('panelize', 0, 'The panelize link for the view mode appears on the page');
+    $this->assertLinkByHref('node/' . $node->nid . '/panelizer/' . $view_mode, 0, 'A link to panelize the view mode appears on the page');
 
     // Verify that the view mode is not currently panelized.
-    $this->drupalGet('node/' . $node->nid . '/panelizer/default');
+    $this->drupalGet('node/' . $node->nid . '/panelizer/' . $view_mode);
     $this->assertRaw(t('This %entity is not currently panelized.', array('%entity' => 'Node')));
 
     // Panelize the view mode.
@@ -94,6 +105,8 @@ class PanelizerNodeTest extends PanelizerTestHelper {
    */
   function testPageMultipleDisplays() {
     // Panelize "Basic page" content type.
+    $content_type = 'page';
+    $view_mode = 'page_manager';
 
     // Ensure node_view panel page is enabled for full page override to work.
     $this->simpleEnablePage('node_view');
@@ -102,23 +115,23 @@ class PanelizerNodeTest extends PanelizerTestHelper {
       'panelizer[status]' => TRUE,
       // Enable the 'Full page override' view mode, which is managed by Page
       // Manager.
-      'panelizer[view modes][page_manager][status]' => TRUE,
+      'panelizer[view modes][' . $view_mode . '][status]' => TRUE,
       // Provide a default display.
-      'panelizer[view modes][page_manager][default]' => TRUE,
+      'panelizer[view modes][' . $view_mode . '][default]' => TRUE,
       // Allow a specific display to be selected per node.
-      'panelizer[view modes][page_manager][choice]' => TRUE,
+      'panelizer[view modes][' . $view_mode . '][choice]' => TRUE,
     );
-    $this->drupalPost('admin/structure/types/manage/page', $edit, t('Save content type'));
+    $this->drupalPost('admin/structure/types/manage/' . $content_type, $edit, t('Save content type'));
     $this->assertResponse(200);
 
     // Verify the admin UI works.
-    $this->drupalGet('admin/structure/types/manage/page/panelizer/page_manager');
+    $this->drupalGet('admin/structure/types/manage/' . $content_type . '/panelizer/' . $view_mode);
     $this->assertResponse(200);
     // Confirm the default display was added.
     $this->assertText('node:page:default');
 
     // Clone the display.
-    $this->drupalGet('admin/structure/types/manage/page/panelizer/page_manager/node:page:default/clone');
+    $this->drupalGet('admin/structure/types/manage/' . $content_type . '/panelizer/' . $view_mode . '/node:' . $content_type . ':default/clone');
     $this->assertResponse(200);
     $this->assertText(t('Name'));
     $this->assertFieldById('edit-title', "Clone of Default", "Administrative Title");
@@ -127,7 +140,7 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     // machine-name.js, which doesn't work via SimpleTest.
     $this->drupalPost(NULL, array('name' => 'clone_of_default'), t('Save'));
     $this->assertResponse(200);
-    $this->assertText(t('!item has been created.', array('!item' => 'node:page:clone_of_default')));
+    $this->assertText(t('!item has been created.', array('!item' => 'node:' . $content_type . ':clone_of_default')));
 
     // Verity the tabs are present on the form.
     $this->assertLink('Settings');
@@ -138,21 +151,17 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->assertLink('Export');
 
     // Confirm the options show up on the node form.
-    $this->drupalGet('node/add/page');
-    $this->assertField('panelizer[page_manager][name]');
+    $this->drupalGet('node/add/' . $content_type);
+    $this->assertField('panelizer[' . $view_mode . '][name]');
 
     // Create a node with cloned display mode.
-    $langcode = LANGUAGE_NONE;
-    $edit = array(
-      'title' => $this->randomName(8),
-      "body[$langcode][0][value]" => $this->randomName(16),
-      'panelizer[page_manager][name]' => 'node:page:clone_of_default',
+    $args = array(
+      'panelizer[' . $view_mode . '][name]' => 'node:' . $content_type . ':clone_of_default',
     );
-    $this->drupalPost('node/add/page', $edit, t('Save'));
-    $this->assertResponse(200);
+    $node = $this->createNode($args);
 
     // Check that the post has been panelized.
-    $node = $this->drupalGetNodeByTitle($edit["title"]);
+    $this->drupalGet('node/' . $node->nid);
     $this->assertLink('Customize display', 0, 'The customize display link appears on the page');
     $this->assertLinkByHref('node/' . $node->nid . '/panelizer', 0, 'A link to customize the node appears on the page');
 
@@ -160,12 +169,12 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->drupalGet('node/' . $node->nid . '/panelizer');
     $this->assertResponse(200);
     $this->assertLink(t('Full page override'), 0, 'The panelize link for the "Full page override" view mode appears on the page');
-    $this->assertLinkByHref('node/' . $node->nid . '/panelizer/page_manager', 0, 'A link to panelize the "Full page override" view mode appears on the page');
+    $this->assertLinkByHref('node/' . $node->nid . '/panelizer/' . $view_mode, 0, 'A link to panelize the "Full page override" view mode appears on the page');
     $this->assertNoLink(t('reset'), 0, 'The current display cannot be reset, it is default');
     $this->assertText(t('Clone of Default'), 0, 'The current selected display is "Clone of Default"');
 
     // Verify that the view mode is not currently panelized.
-    $this->drupalGet('node/' . $node->nid . '/panelizer/page_manager');
+    $this->drupalGet('node/' . $node->nid . '/panelizer/' . $view_mode);
     $this->assertResponse(200);
 
     // Panelize this view mode.

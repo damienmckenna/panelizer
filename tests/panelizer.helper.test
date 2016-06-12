@@ -156,4 +156,27 @@ class PanelizerTestHelper extends DrupalWebTestCase {
     $this->assertText(strip_tags(t('The language %language has been created and can now be used. More information is available on the <a href="@locale-help">help screen</a>.', array('%language' => t($language), '@locale-help' => url('admin/help/locale')))), 'A new language has been added.');
   }
 
+  /**
+   * Create a node for testing.
+   *
+   * @params array $options
+   *   A list of additional arguments to be passed to the node/add/page form.
+   *
+   * @return object
+   *   A node object.
+   */
+  function createNode(array $options = array()) {
+    // Create a node.
+    $this->drupalGet('node/add/page');
+    $this->assertResponse(200);
+    $langcode = LANGUAGE_NONE;
+    $edit = array(
+      'title' => $this->randomName(8),
+      "body[$langcode][0][value]" => $this->randomName(16),
+    ) + $options;
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    return $this->drupalGetNodeByTitle($edit['title']);
+  }
+
 }

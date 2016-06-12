@@ -932,10 +932,7 @@ function panelizer_has_no_choice_callback($handler, $bundle, $view_mode = NULL) 
     return FALSE;
   }
 
-  $has_default = $handler->has_default_panel($bundle);
-  $has_choice = $handler->has_panel_choice($bundle);
-
-  return $has_default && !$has_choice;
+  return !$handler->has_panel_choice($bundle);
 }
 
 /**
