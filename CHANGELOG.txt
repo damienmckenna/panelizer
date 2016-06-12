@@ -86,6 +86,7 @@ By DamienMcKenna: Properly formatted all comments in the main module file.
 #2136205 by Scott Robertson, DamienMcKenna: When using Content Translation to
   translate a panelized node, clone the Panelizer configuration.
 #2742601 by DamienMcKenna: Preparation for adding more tests.
+#2742609 by DamienMcKenna: Added tests for core node revision handling.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
