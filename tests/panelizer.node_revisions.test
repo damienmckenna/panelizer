@@ -92,6 +92,26 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
     $this->assertResponse(200);
     $this->assertText(t('The settings have been updated.'));
 
+    // Clone the cloned display.
+    $this->drupalGet('admin/structure/types/manage/page/panelizer/page_manager/node:page:clone_of_default/clone');
+    $this->assertResponse(200);
+    $this->assertText(t('Name'));
+    $this->assertFieldById('edit-title', "Clone of Clone of Default", "Administrative Title");
+
+    // Manually set the machine name here as it's normally set by
+    // machine-name.js, which doesn't work via SimpleTest.
+    $this->drupalPost(NULL, array('name' => 'clone_of_clone_of_default'), t('Save'));
+    $this->assertResponse(200);
+    $this->assertText(t('!item has been created.', array('!item' => 'node:page:clone_of_clone_of_default')));
+
+    // Set a custom css class to identify this cloned-cloned display.
+    $edit = array();
+    $clone_of_clone_css_class = 'panelizer-test-page-node-revisions-cloned-clone';
+    $edit['css_class'] = $clone_of_clone_css_class;
+    $this->drupalPost('admin/structure/types/manage/page/panelizer/page_manager/node:page:clone_of_clone_of_default/settings', $edit, t('Save'));
+    $this->assertResponse(200);
+    $this->assertText(t('The settings have been updated.'));
+
     // Assert panel choice for new pages.
     $this->drupalGet('node/add/page');
     $this->assertField('panelizer[page_manager][name]', 'Display can be chosen on new page form');
@@ -143,26 +163,6 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
     // add a default class.
     $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => $css_default_class));
     $this->assertEqual(count($elements), 1, 'The node is using the default display.');
-
-    // Clone the cloned display.
-    $this->drupalGet('admin/structure/types/manage/page/panelizer/page_manager/node:page:clone_of_default/clone');
-    $this->assertResponse(200);
-    $this->assertText(t('Name'));
-    $this->assertFieldById('edit-title', "Clone of Clone of Default", "Administrative Title");
-
-    // Manually set the machine name here as it's normally set by
-    // machine-name.js, which doesn't work via SimpleTest.
-    $this->drupalPost(NULL, array('name' => 'clone_of_clone_of_default'), t('Save'));
-    $this->assertResponse(200);
-    $this->assertText(t('!item has been created.', array('!item' => 'node:page:clone_of_clone_of_default')));
-
-    // Set a custom css class to identify this cloned display.
-    $edit = array();
-    $clone_of_clone_css_class = 'panelizer-test-page-node-revisions-cloned-clone';
-    $edit['css_class'] = $clone_of_clone_css_class;
-    $this->drupalPost('admin/structure/types/manage/page/panelizer/page_manager/node:page:clone_of_clone_of_default/settings', $edit, t('Save'));
-    $this->assertResponse(200);
-    $this->assertText(t('The settings have been updated.'));
 
     // Create a new revision with another different display.
     $langcode = LANGUAGE_NONE;
