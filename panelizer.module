@@ -45,7 +45,7 @@ function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_disp
   $storage_type = $panels_display->getStorageType();
 
   // Add our Javascript customizations for the IPE.
-  if ($builder->getPluginId() == 'ipe' && in_array($storage_type, ['panelizer_default', 'panelizer_field'])) {
+  if ($builder->getPluginId() == 'ipe' && in_array($storage_type, ['panelizer_default', 'panelizer_field']) && in_array('panels_ipe/panels_ipe', $build['#attached']['library'])) {
     $build['#attached']['library'][] = 'panelizer/panels_ipe';
 
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
