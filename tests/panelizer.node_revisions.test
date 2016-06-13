@@ -243,7 +243,7 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
       ->execute()
       ->fetchAll();
     $this->assertEqual($old_count, count($records) + 1);
-    $this->verbose(print_r($records, TRUE));
+    $this->verbose('<pre>' . print_r($records, TRUE) . '</pre>');
 
     // Revert to the first revision.
     $revisions = node_revision_list($node);
@@ -273,7 +273,7 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
       ->execute()
       ->fetchAll();
     $this->assertEqual($old_count, count($records));
-    $this->verbose(print_r($records, TRUE));
+    $this->verbose('<pre>' . print_r($records, TRUE) . '</pre>');
 
     $this->drupalGet('node/' . $node->nid);
     $this->assertResponse(200);
