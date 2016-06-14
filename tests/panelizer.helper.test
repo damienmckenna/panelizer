@@ -179,4 +179,41 @@ class PanelizerTestHelper extends DrupalWebTestCase {
     return $this->drupalGetNodeByTitle($edit['title']);
   }
 
+  /**
+   * Compare panes from two different displays to make sure they're the same.
+   *
+   * @param object $panelizer1
+   *   The first display object.
+   * @param object $panelizer2
+   *   The second display object.
+   */
+  function compareDisplayPanes($panelizer1, $panelizer2) {
+    // Make simpler structure of the two display's panes, to make them easier to
+    // examine later.
+    $panes1 = array();
+    $panes2 = array();
+    foreach ($panelizer1->display->content as $key => $pane) {
+      $panes1[] = $pane;
+    }
+    foreach ($panelizer2->display->content as $key => $pane) {
+      $panes2[] = $pane;
+    }
+
+    // Compare the two sets of panes.
+    foreach ($panes1 as $key => $pane) {
+      // Verify that the pane exists in the second display.
+      $this->assertTrue(isset($panes2[$key]));
+
+      // Confirm the two panes are of the same type.
+      $this->assertEqual($pane->type, $panes2[$key]->type);
+      $this->assertEqual($pane->subtype, $panes2[$key]->subtype);
+
+      // Confirm the pid values are different.
+      $this->assertNotEqual($pane->pid, $panes2[$key]->pid);
+
+      // Confirm the UUID values are different.
+      $this->assertNotEqual($pane->uuid, $panes2[$key]->uuid);
+    }
+  }
+
 }

@@ -93,6 +93,7 @@ By DamienMcKenna: Properly formatted all comments in the main module file.
   Panelizer admin paths, display an appropriate error message instead of
   throwing a 404 page.
 By DamienMcKenna: Minor refactoring to node revision tests.
+#2748373 by DamienMcKenna: Tests to confirm defaults can be cloned.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
