@@ -246,8 +246,89 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->verbose('<pre>' . print_r($defaults, TRUE) . '</pre>');
 
     // Compare the displays.
-    // @todo Fix the bug that causes the UUID comparison to fail.
-    // $this->compareDisplayPanes($defaults[$original], $defaults[$clone]);
+    $this->compareDisplayPanes($defaults[$original], $defaults[$clone]);
+  }
+
+  /**
+   * Confirm that overriding a default display works correctly.
+   */
+  function testNodeCustomDisplay() {
+    // Panelize "Basic page" content type.
+    $content_type = 'page';
+    $view_mode = 'page_manager';
+    $panelizer_name = "node:{$content_type}:default";
+
+    // Ensure node_view panel page is enabled for full page override to work.
+    $this->simpleEnablePage('node_view');
+
+    $edit = array(
+      'panelizer[status]' => TRUE,
+      // Enable the 'Full page override' view mode, which is managed by Page
+      // Manager.
+      'panelizer[view modes][' . $view_mode . '][status]' => TRUE,
+      // Provide a default display.
+      'panelizer[view modes][' . $view_mode . '][default]' => TRUE,
+      // Allow a specific display to be selected per node.
+      'panelizer[view modes][' . $view_mode . '][choice]' => TRUE,
+    );
+    $this->drupalPost('admin/structure/types/manage/' . $content_type, $edit, t('Save content type'));
+    $this->assertResponse(200);
+
+    // Add a custom class to the default display. Without making this change the
+    // display won't be available via the CTools exports system.
+    $this->drupalGet("admin/structure/types/manage/{$content_type}/panelizer/{$view_mode}/{$panelizer_name}/settings");
+    $edit = array(
+      'css_class' => 'panelizer-default',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Create a test node.
+    $node = $this->createNode();
+
+    // Load the node page.
+    $this->drupalGet('node/' . $node->nid);
+
+    // Check that the new revision is rendered using the cloned display.
+    $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => 'panelizer-default'));
+    $this->assertEqual(count($elements), 1, 'The node is using the default display.');
+
+    // Check that the post has been panelized.
+    $this->drupalGet('node/' . $node->nid . '/panelizer/' . $view_mode . '/settings');
+    $this->assertResponse(200);
+    $this->assertFieldByName('css_class');
+    $args = array(
+      'css_class' => 'panelizer-test',
+    );
+    $this->drupalPost(NULL, $args, t('Save'));
+
+    $this->drupalGet('node/' . $node->nid);
+    $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => 'panelizer-test'));
+    $this->assertEqual(count($elements), 1, 'The node is using the overridden display.');
+
+    // Confirm one more {panelizer_entity} record was added.
+    $records = db_select('panelizer_entity', 'pe')
+      ->fields('pe')
+      ->condition('entity_type', 'node')
+      ->condition('entity_id', $node->nid)
+      ->orderBy('pe.revision_id')
+      ->execute()
+      ->fetchAll();
+    $this->verbose('<pre>' . print_r($records, TRUE) . '</pre>');
+    $this->assertTrue(count($records));
+    $pe = $records[0];
+
+    // Load the default display object.
+    $defaults = ctools_export_load_object('panelizer_defaults', 'names', array($panelizer_name => $panelizer_name));
+    $default_display = $defaults[$panelizer_name];
+    $this->verbose('<pre>' . print_r($default_display, TRUE) . '</pre>');
+
+    // Load the overridden display.
+    $displays = panels_load_displays(array($pe->did));
+    $this->verbose('<pre>' . print_r($displays, TRUE) . '</pre>');
+    $pe->display = $displays[$pe->did];
+
+    // Compare the two displays.
+    $this->compareDisplayPanes($default_display, $pe);
   }
 
 }
