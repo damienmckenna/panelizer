@@ -98,6 +98,7 @@ By DamienMcKenna: Minor refactoring to node revision tests.
   display is overridden per node, leaving UUID fixes to Panels to handle.
 #2404999 by DamienMcKenna, joegraduate: Don't save {panelizer_entity} records if
   the display is using a default.
+#2756435 by DamienMcKenna: Test cleanups.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
