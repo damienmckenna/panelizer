@@ -118,17 +118,17 @@ API
 --------------------------------------------------------------------------------
 Panelizer 7.x-3.x is constructed on an Object Oriented plugin. There is one
 plugin per entity type and it MUST be named exactly the same as the entity
-type. The easiest way to add Panelizer support for a custom entity is to 
-copy the node entity. 
+type. The easiest way to add Panelizer support for a custom entity is to copy
+the node entity. 
 
 As a CTools plugin, you will be required to implement 
-hook_ctools_plugin_directory. Then copy node.inc to your plugin directory
-as MY_ENTITY_TYPE.inc and modify the name of the handler it uses. Copy
-PanelizerEntityNode.class.php to MyModuleEntityMyEntity.class.php -- and
-make sure the name of this file matches the handler in your .inc file.
+hook_ctools_plugin_directory. Then copy node.inc to your plugin directory as
+MY_ENTITY_TYPE.inc and modify the name of the handler it uses. Copy
+PanelizerEntityNode.class.php to MyModuleEntityMyEntity.class.php -- and make
+sure the name of this file matches the handler in your .inc file.
 
-The required implementation pieces are straightforward. You do need to set
-a flag if the entity supports revisions so that Panelizer can write the
+The required implementation pieces are straightforward. You do need to set a
+flag if the entity supports revisions so that Panelizer can write the
 information.
 
 If the entity does not support bundles it can only panelize the entire entity.
@@ -136,11 +136,10 @@ If the entity does not support bundles it can only panelize the entire entity.
 
 Troubleshooting / Known Issues
 --------------------------------------------------------------------------------
-* Saving an entity's overridden Panelizer display (i.e. nodes, etc) can cause
-  the entity's path alias to be reset. This is an outstanding bug in Pathauto
-  v7.x-1.2 and can be resolved by either installing Pathauto Persistent State
-  (https://www.drupal.org/project/pathauto_persist) or applying the latest
-  patch from https://www.drupal.org/node/936222.
+* When using older releases of Pathauto it was possible that saving an entity's
+  overridden Panelizer display (i.e. nodes, etc) would cause the entity's path
+  alias to be reset. This was a bug in Pathauto prior to v7.x-1.3 and can be
+  fixed by updating that module to the latest release.
 * Revisions handling using Workbench Moderation and the Panels IPE (In-Place
   Editor) is problematic. This problem is being collaborated on in the following
   issue:

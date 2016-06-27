@@ -103,6 +103,7 @@ By DamienMcKenna: Minor refactoring to node revision tests.
   disappear after a Panelizer display is modified.
 #1637304 by japerry, Steven Jones, DamienMcKenna: Simplified the main query in
   hook_entity_load(), added an index on {panelizer_entity}.revision_id.
+By DamienMcKenna: Updated the README.txt note about Pathauto.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
