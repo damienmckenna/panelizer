@@ -110,6 +110,7 @@ By DamienMcKenna: Updated the README.txt note about Pathauto.
   on node display.
 #2630446 by mikedotexe, DamienMcKenna: Documentation updates for
   panelizer-view-mode.tpl.php.
+#2709487 by DamienMcKenna: Fixed link paths in contextual menus.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
