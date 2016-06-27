@@ -108,6 +108,8 @@ By DamienMcKenna: Updated the README.txt note about Pathauto.
   hook_entity_update() if $entity->panelizer[$view_mode] is empty.
 #1710586 by e.bogatyrev: Problem with contextual links and context definitions
   on node display.
+#2630446 by mikedotexe, DamienMcKenna: Documentation updates for
+  panelizer-view-mode.tpl.php.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
