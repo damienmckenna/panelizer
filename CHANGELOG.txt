@@ -96,6 +96,8 @@ By DamienMcKenna: Minor refactoring to node revision tests.
 #2748373 by DamienMcKenna: Tests to confirm defaults can be cloned.
 #2577031 by DamienMcKenna, denisz: Tests to confirm what happens when a default
   display is overridden per node, leaving UUID fixes to Panels to handle.
+#2404999 by DamienMcKenna, joegraduate: Don't save {panelizer_entity} records if
+  the display is using a default.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02

@@ -272,7 +272,9 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
       ->orderBy('pe.revision_id')
       ->execute()
       ->fetchAll();
-    $this->assertEqual($old_count, count($records));
+    // Because one of the displays is now using a default, there'll be one less
+    // record.
+    $this->assertEqual($old_count, count($records) + 1);
     $this->verbose('<pre>' . print_r($records, TRUE) . '</pre>');
 
     $this->drupalGet('node/' . $node->nid);
@@ -284,7 +286,7 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
     $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => $css_default_class));
     $this->assertEqual(count($elements), 1, 'The node is using the default display again.');
 
-    // Confirm the new display is the same as the old display.
+    // Confirm there is no record for this object that is now using the default.
     $new_display = NULL;
     foreach ($records as $record) {
       if ($record->revision_id == $node_revision->vid) {
@@ -292,7 +294,7 @@ class PanelizerNodeRevisionTest extends PanelizerTestHelper {
         break;
       }
     }
-    $this->assertEqual($new_display, 'node:page:default');
+    $this->assertNull($new_display);
   }
 
 }

@@ -295,6 +295,8 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     // Check that the post has been panelized.
     $this->drupalGet('node/' . $node->nid . '/panelizer/' . $view_mode . '/settings');
     $this->assertResponse(200);
+
+    // Add a CSS class to the display.
     $this->assertFieldByName('css_class');
     $args = array(
       'css_class' => 'panelizer-test',

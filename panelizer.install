@@ -1136,3 +1136,68 @@ function panelizer_update_7121() {
     }
   }
 }
+
+/**
+ * Remove {panelizer_entity} records with only default values.
+ */
+function panelizer_update_7300(&$sandbox) {
+  // Initialize sandbox.
+  if (empty($sandbox)) {
+    $sandbox['progress'] = 0;
+    $sandbox['processed_entity_types'] = array();
+
+    // Get a list of all records using a default display.
+    $sandbox['max'] = db_query('SELECT COUNT(DISTINCT entity_type) FROM {panelizer_entity} WHERE did = 0')->fetchField();
+
+    watchdog('panelizer', 'Default panelizer records will be removed for @count entity types.', array('@count' => $sandbox['max']));
+  }
+
+  // Main sandbox query and loop.  Processes one entity type at a time.
+  $query = db_select('panelizer_entity', 'pe')
+    ->distinct()
+    ->fields('pe', array('entity_type'));
+  if (!empty($sandbox['processed_entity_types'])) {
+    $query->condition('entity_type', $sandbox['processed_entity_types'], 'NOT IN');
+  }
+  $entity_types = $query->execute()->fetchCol();
+  foreach ($entity_types as $entity_type) {
+    // Get the default panelizer names for the entity type.
+    $default_names = array();
+    $entity_info = entity_get_info($entity_type);
+    if (!empty($entity_info) && !empty($entity_info['bundles'])) {
+      foreach ($entity_info['bundles'] as $bundle => $bundle_info) {
+        $var_name = 'panelizer_defaults_' . $entity_type . '_' . $bundle;
+        $settings = variable_get($var_name);
+        if (!empty($settings) && !empty($settings['view modes'])) {
+          foreach ($settings['view modes'] as $view_mode => $config) {
+            $default_name = implode(':', array($entity_type, $bundle, 'default'));
+            if ($view_mode != 'page_manager') {
+              $default_name .= ':' . $view_mode;
+            }
+            $default_names[] = $default_name;
+          }
+        }
+      }
+    }
+
+    // Delete panelizer records that have one of the default names.
+    $deleted = db_delete('panelizer_entity')
+      ->condition('name', $default_names, 'IN')
+      ->condition('entity_type', $entity_type)
+      ->execute();
+    if ($deleted > 0) {
+      watchdog('panelizer', '@count default panelizer records were removed for entity type: @entity_type.', array('@count' => $deleted, '@entity_type' => $entity_type));
+    }
+    else {
+      watchdog('panelizer', 'No default panelizer records were found for entity type: @entity_type.', array('@entity_type' => $entity_type));
+    }
+
+    // Update sandbox progress.
+    $sandbox['progress']++;
+    $sandbox['processed_entity_types'][] = $entity_type;
+  }
+
+  if ($sandbox['progress'] != $sandbox['max']) {
+    $sandbox['#finished'] = $sandbox['progress'] / $sandbox['max'];
+  }
+}
