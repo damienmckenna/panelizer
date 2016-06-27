@@ -1585,6 +1585,11 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
     }
 
     foreach ($entity->panelizer as $view_mode => $panelizer) {
+      // Don't write out empty records.
+      if (empty($panelizer)) {
+        continue;
+      }
+
       // Just a safety check to make sure we can't have a missing view mode.
       if (empty($view_mode)) {
         $view_mode = 'page_manager';
@@ -1673,6 +1678,11 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
 
     // Update each panelizer configuration.
     foreach ($entity->panelizer as $view_mode => $panelizer) {
+      // Don't write out empty records.
+      if (empty($panelizer)) {
+        continue;
+      }
+
       // In some cases $panelizer is array, convert it to an object.
       if (is_array($panelizer)) {
         $panelizer = (object) $panelizer;

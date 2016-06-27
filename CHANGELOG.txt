@@ -104,6 +104,8 @@ By DamienMcKenna: Minor refactoring to node revision tests.
 #1637304 by japerry, Steven Jones, DamienMcKenna: Simplified the main query in
   hook_entity_load(), added an index on {panelizer_entity}.revision_id.
 By DamienMcKenna: Updated the README.txt note about Pathauto.
+#2675766 by gustavderdrache: Don't save records in hook_entity_insert or
+  hook_entity_update() if $entity->panelizer[$view_mode] is empty.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
