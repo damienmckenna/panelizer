@@ -84,7 +84,7 @@ $plugin = array(
 function _panelizer_panelizer_task_get_context($handler, $contexts) {
   $contexts = ctools_context_handler_get_handler_contexts($contexts, $handler);
 
-  if (isset($handler->conf['context']) && !empty($contexts[$handler->conf['context']])) {
+  if (isset($handler->conf['context']) && is_string($handler->conf['context']) && !empty($contexts[$handler->conf['context']])) {
     return $contexts[$handler->conf['context']];
   }
 

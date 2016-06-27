@@ -106,6 +106,8 @@ By DamienMcKenna: Minor refactoring to node revision tests.
 By DamienMcKenna: Updated the README.txt note about Pathauto.
 #2675766 by gustavderdrache: Don't save records in hook_entity_insert or
   hook_entity_update() if $entity->panelizer[$view_mode] is empty.
+#1710586 by e.bogatyrev: Problem with contextual links and context definitions
+  on node display.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
