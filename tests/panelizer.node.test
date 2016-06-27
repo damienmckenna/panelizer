@@ -308,14 +308,7 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->assertEqual(count($elements), 1, 'The node is using the overridden display.');
 
     // Confirm one more {panelizer_entity} record was added.
-    $records = db_select('panelizer_entity', 'pe')
-      ->fields('pe')
-      ->condition('entity_type', 'node')
-      ->condition('entity_id', $node->nid)
-      ->orderBy('pe.revision_id')
-      ->execute()
-      ->fetchAll();
-    $this->verbose('<pre>' . print_r($records, TRUE) . '</pre>');
+    $records = $this->getPanelizerEntityRecords('node', $node->nid);
     $this->assertTrue(count($records));
     $pe = $records[0];
 
