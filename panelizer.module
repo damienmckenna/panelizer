@@ -1637,10 +1637,12 @@ function panelizer_form_panels_ipe_edit_control_form_alter(&$form, &$form_state)
   $renderer = $form_state['renderer'];
 
   $cache_key = $renderer->display->cache_key;
-  list($module, $type, $key) = explode(':', $cache_key, 3);
-  if ($module != 'panelizer') {
+  $parts = explode(':', $cache_key, 3);
+  if ($parts[0] != 'panelizer') {
     return;
   }
+
+  list($module, $type, $key) = $parts;
 
   if ($type == 'default') {
     return;
@@ -1762,7 +1764,13 @@ function panelizer_form_panels_change_layout_alter(&$form, &$form_state) {
     // Extract the display from the form state.
     $display = $form_state['display'];
 
-    list($module, $type, $key) = explode(':', $display->cache_key, 3);
+    $cache_key = $display->cache_key;
+    $parts = explode(':', $cache_key, 3);
+    if ($parts[0] != 'panelizer') {
+      return;
+    }
+
+    list($module, $type, $key) = $parts;
 
     // If the display is not owned by Panelizer, or is default handler, exit.
     if ($module != 'panelizer' || $type == 'default') {
