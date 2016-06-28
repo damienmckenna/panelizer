@@ -115,6 +115,7 @@ By DamienMcKenna: Updated the README.txt note about Pathauto.
 #2472519 by joelstein, DamienMcKenna: View mode substitution wasn't working
   correctly.
 #2757277 by DamienMcKenna: Resetting a display didn't work correctly.
+#2282605 by joelstein: Support for the core search system's custom view modes.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02

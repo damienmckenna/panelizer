@@ -370,6 +370,56 @@ function panelizer_entity_view_alter(&$build, $entity_type) {
   $recursion_prevention[$entity_type][$entity_id][$view_mode] = FALSE;
 }
 
+/**
+ * Implements hook_node_update_index().
+ */
+function panelizer_node_update_index($node) {
+  // Populate search index for nodes managed via Panelizer if 'search_index'
+  // view mode is configured to do so.
+  if (
+    ($handler = panelizer_entity_plugin_get_handler('node'))
+    && ($view_mode = $handler->get_view_mode('search_index', $node->type))
+    && $handler->is_panelized($node->type . '.' . $view_mode)
+    && !empty($node->panelizer[$view_mode])
+    && ($info = $handler->render_entity($node, $view_mode))
+  ) {
+    $build['#view_mode'] = $view_mode;
+    $build['#theme'] = 'panelizer_view_mode';
+    $build['#panelizer'] = $node->panelizer[$view_mode];
+    $build['#panelizer_content'] = $info;
+    $build['#panelizer_handler'] = $handler;
+    $build['#panelizer_entity'] = $node;
+    $build['#panelizer_bundle'] = $node->type;
+    $build['#panelizer_entity_id'] = $node->nid;
+    return drupal_render($build);
+  }
+}
+
+/**
+ * Implements hook_node_search_result().
+ */
+function panelizer_node_search_result($node) {
+  // Populate search result highlighting input for nodes managed via Panelizer
+  // if 'search_result' view mode is configured to do so.
+  if (
+    ($handler = panelizer_entity_plugin_get_handler('node'))
+    && ($view_mode = $handler->get_view_mode('search_result', $node->type))
+    && $handler->is_panelized($node->type . '.' . $view_mode)
+    && !empty($node->panelizer[$view_mode])
+    && ($info = $handler->render_entity($node, $view_mode))
+  ) {
+    $build['#view_mode'] = $view_mode;
+    $build['#theme'] = 'panelizer_view_mode';
+    $build['#panelizer'] = $node->panelizer[$view_mode];
+    $build['#panelizer_content'] = $info;
+    $build['#panelizer_handler'] = $handler;
+    $build['#panelizer_entity'] = $node;
+    $build['#panelizer_bundle'] = $node->type;
+    $build['#panelizer_entity_id'] = $node->nid;
+    $node->rendered .= drupal_render($build);
+  }
+}
+
 // -----------------------------------------------------------------------
 // Panels and CTools hooks
 
