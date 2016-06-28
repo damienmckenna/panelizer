@@ -2563,7 +2563,7 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
   }
 
   /**
-   * Reset panelizers associated with the entity to the appropriate default.
+   * Reset displays so that the defaults can be used instead.
    *
    * @param object $entity
    *   The entity.
@@ -2577,21 +2577,26 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
       drupal_set_message(t('Unable to reset this view mode'));
     }
     else {
-      // Identify this entity's bundle.
-      list($entity_id, , $bundle) = entity_extract_ids($this->entity_type, $entity);
+      // Build a list of displays to delete.
+      $dids = array();
 
-      // Update the panelizer_entity record.
+      // Identify this entity's bundle.
+      list($entity_id, $revision_id, $bundle) = entity_extract_ids($this->entity_type, $entity);
+
+      // Add the custom display to the list of displays to delete.
+      if (!empty($entity->panelizer[$view_mode]->did)) {
+        $dids[] = $entity->panelizer[$view_mode]->did;
+      }
+
+      // Update the {panelizer_entity} record.
       $entity->panelizer[$view_mode]->did = NULL;
-      $entity->panelizer[$view_mode]->name = $this->get_default_display_name($bundle, $view_mode);
+      $entity->panelizer[$view_mode]->name = NULL;
 
       // Update the entity.
       $this->entity_save($entity);
 
       // If a new revision was not created, delete any unused displays.
-      if ($this->supports_revisions && empty($entity->revision)) {
-        // Get the IDs for this revision.
-        list(, $revision_id, $bundle) = entity_extract_ids($this->entity_type, $entity);
-
+      if (empty($entity->revision)) {
         // Work out which view modes to use.
         if (!empty($view_mode)) {
           $view_modes = array($view_mode);
@@ -2602,34 +2607,35 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
         }
 
         // Locate all displays associated with the entity.
-        $dids = db_select('panelizer_entity', 'p')
+        $new_dids = db_select('panelizer_entity', 'p')
           ->fields('p', array('did'))
           ->condition('entity_type', $this->entity_type)
-          ->condition('entity_id', $entity_id)
           ->condition('revision_id', $revision_id)
           ->condition('view_mode', $view_modes, 'IN')
           ->condition('did', '0', '>')
           ->execute()
           ->fetchCol();
+        if (!empty($new_dids)) {
+          $dids = array_merge($dids, $new_dids);
+        }
 
         // Delete the display records if they are not still in use.
         foreach (array_unique($dids) as $did) {
-          $in_use = db_select('panelizer_entity', 'p')
-            ->fields('p', array('did'))
-            ->condition('did', $did)
-            ->execute()
-            ->fetchCol();
-
-          // Only delete the display if another revision was not using it.
-          if (empty($in_use)) {
-            panels_delete_display($did);
-          }
+          panels_delete_display($did);
         }
-      }
 
-      // Reset the entity's cache. If the EntityCache module is enabled, this
-      // also resets its permanent cache.
-      entity_get_controller($this->entity_type)->resetCache(array($entity_id));
+        // Delete the {panelizer_entity} records.
+        db_delete('panelizer_entity')
+          ->condition('entity_type', $this->entity_type)
+          ->condition('revision_id', $revision_id)
+          ->condition('view_mode', $view_modes, 'IN')
+          ->condition('did', $dids, 'IN')
+          ->execute();
+
+        // Reset the entity's cache. If the EntityCache module is enabled, this
+        // also resets its permanent cache.
+        entity_get_controller($this->entity_type)->resetCache(array($entity_id));
+      }
     }
   }
 

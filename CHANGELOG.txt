@@ -114,6 +114,7 @@ By DamienMcKenna: Updated the README.txt note about Pathauto.
 #2600178 by joelstein: Some $cache_key values may only have two parts.
 #2472519 by joelstein, DamienMcKenna: View mode substitution wasn't working
   correctly.
+#2757277 by DamienMcKenna: Resetting a display didn't work correctly.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
