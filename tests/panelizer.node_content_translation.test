@@ -78,7 +78,7 @@ class PanelizerNodeContentTranslationTest extends PanelizerTestHelper {
 
     // Enable Panelizer for this content type; receive an updated handler so
     // that it can be used later.
-    $handler = $this->togglePanelizer($entity_type, $content_type, 1, 1, 1, 'page_manager');
+    $handler = $this->togglePanelizer($entity_type, $content_type, 'page_manager', 1, 1, 1);
 
     // Create a node with the English language; it will inherit the default
     // Panelizer display.

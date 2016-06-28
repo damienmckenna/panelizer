@@ -27,16 +27,16 @@ class PanelizerTestHelper extends DrupalWebTestCase {
    *   The entity type to configure, defaults to 'node'.
    * @param string $bundle
    *   The entity bundle to enable, defaults to 'page'.
+   * @param string $view_mode
+   *   The entity view mode to be panelized; defaults to 'page_manager'.
    * @param boolean $status
    *   Indicate whther the view mode is enabled or disabled; defaults to TRUE.
    * @param boolean $use_default
    *   Whether to enable a default display; defaults to TRUE.
    * @param boolean $choice
    *   Whether to enable a display choice may be made; defaults to TRUE.
-   * @param string $view_mode
-   *   The entity view mode to be panelized; defaults to 'page_manager'.
    */
-  protected function togglePanelizer($entity_type = 'node', $bundle = 'page', $status = 1, $use_default = 1, $choice = 1, $view_mode = 'page_manager') {
+  protected function togglePanelizer($entity_type = 'node', $bundle = 'page', $view_mode = 'page_manager', $status = 1, $use_default = 1, $choice = 1) {
     variable_set('panelizer_defaults_' . $entity_type . '_' . $bundle, array(
       'status' => 1,
       'help' => '',

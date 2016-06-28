@@ -784,15 +784,17 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
    *   The final view mode that will be used.
    */
   public function get_view_mode($view_mode, $bundle) {
-    // See if a substitute should be used.
     $settings = !empty($this->plugin['bundles'][$bundle]) ? $this->plugin['bundles'][$bundle] : array('status' => FALSE, 'choice' => FALSE);
-    if (!empty($settings['view modes'][$view_mode]['substitute'])) {
-      $view_mode = $settings['view modes'][$view_mode]['substitute'];
-    }
 
     // Test to see if this view mode is actually panelizable at all.
     if (!isset($this->plugin['view modes'][$view_mode]) || (empty($this->plugin['view modes'][$view_mode]['custom settings']) && empty($this->plugin['view mode status'][$bundle][$view_mode]))) {
       $view_mode = 'default';
+    }
+
+    // See if a substitute should be used.
+    $substitute = $this->get_substitute($view_mode, $bundle);
+    if (!empty($substitute)) {
+      $view_mode = $substitute;
     }
 
     return $view_mode;
@@ -3341,10 +3343,18 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
    *      blocks or not when being rendered.
    */
   function render_entity($entity, $view_mode, $langcode = NULL, $args = array(), $address = NULL, $extra_contexts = array()) {
+    list($entity_id, $revision_id, $bundle) = entity_extract_ids($this->entity_type, $entity);
+
+    // Optionally substitute the view mode with another one.
+    $substitute = $this->get_substitute($view_mode, $bundle);
+    if (!empty($substitute)) {
+      $view_mode = $substitute;
+    }
+
+    // Nothing configured for this view mode.
     if (empty($entity->panelizer[$view_mode]) || empty($entity->panelizer[$view_mode]->display)) {
       return FALSE;
     }
-    list($entity_id, $revision_id, $bundle) = entity_extract_ids($this->entity_type, $entity);
 
     $panelizer = $entity->panelizer[$view_mode];
     $display = $panelizer->display;
@@ -3372,7 +3382,8 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
       panels_get_current_page_display($display);
     }
 
-    // Allow applications to alter the panelizer and the display before rendering them.
+    // Allow applications to alter the panelizer and the display before
+    // rendering them.
     drupal_alter('panelizer_pre_render', $panelizer, $display, $entity);
 
     ctools_include('plugins', 'panels');

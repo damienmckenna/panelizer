@@ -326,4 +326,58 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->compareDisplayPanes($default_display, $pe);
   }
 
+  /**
+   * Confirm that view mode reassignment works correctly.
+   */
+  function testViewModeReassignment() {
+    $entity_type = 'node';
+    $content_type = 'page';
+    $view_mode = 'teaser';
+    $css_class = 'panelizer-' . $view_mode;
+    $panelizer_name = "node:{$content_type}:default:{$view_mode}";
+
+    // Enable the Panels view mode too.
+    $this->simpleEnablePage('node_view');
+
+    // Enable Panelizer for the 'page' content type for view mode.
+    $this->togglePanelizer($entity_type, $content_type, $view_mode);
+    
+    // Add a custom class to the default display.
+    $this->drupalGet("admin/structure/types/manage/{$content_type}/panelizer/{$view_mode}/{$panelizer_name}/settings");
+    $edit = array(
+      'css_class' => $css_class,
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Create a node, confirm that it doesn't have the class.
+    $node = $this->createNode();
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertResponse(200);
+    $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => $css_class));
+    $this->assertEqual(count($elements), 0, "The node is not using the teaser view mode's display.");
+
+    // Enable Panelizer for the Full Page Override (i.e. Page Manager) view mode
+    // but make it use the Teaser view mode's display.
+    $this->drupalGet('admin/structure/types/manage/' . $content_type);
+    $this->assertResponse(200);
+    $edit = array(
+      'panelizer[view modes][page_manager][status]' => TRUE,
+      'panelizer[view modes][page_manager][substitute]' => $view_mode,
+      'panelizer[view modes][page_manager][default]' => 0,
+      'panelizer[view modes][page_manager][choice]' => 0,
+    );
+    $this->drupalPost(NULL, $edit, t('Save content type'));
+
+    // Load these two pages for testing purposes, just to see the configuration.
+    $this->drupalGet('admin/structure/types/manage/' . $content_type);
+    $this->drupalGet('node/' . $node->nid . '/panelizer');
+
+    // Load the node page again, confirm that the Teaser view mode is now being
+    // used.
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertResponse(200);
+    $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => $css_class));
+    $this->assertEqual(count($elements), 1, "The node is now using the teaser view mode's display.");
+  }
+
 }

@@ -109,7 +109,7 @@ class PanelizerUserTest extends PanelizerTestHelper {
    * Confirm that individual objects can be panelized.
    */
   function testUserPanelizeIt() {
-    $this->togglePanelizer('user', 'user', 1, 0, 0, 'default');
+    $this->togglePanelizer('user', 'user', 'default', 1, 0, 0);
 
     // Check that the view mode can be panelized.
     $this->drupalGet('user/' . $this->admin_user->uid . '/panelizer');
