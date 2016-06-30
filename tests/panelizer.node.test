@@ -188,6 +188,53 @@ class PanelizerNodeTest extends PanelizerTestHelper {
     $this->assertResponse(200);
     $this->assertLink(t('reset'), 0, 'The current panelizer state can be reset');
     $this->assertText(t('Custom'), 0, 'The current panelizer state of this node is "Custom"');
+
+    // Add a custom class to the original display.
+    $panelizer_name = 'node:' . $content_type . ':default';
+    $this->drupalGet("admin/structure/types/manage/{$content_type}/panelizer/{$view_mode}/{$panelizer_name}/settings");
+    $edit = array(
+      'css_class' => 'panelizer-original',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Add a custom class to the cloned display.
+    $panelizer_name = 'node:' . $content_type . ':clone_of_default';
+    $this->drupalGet("admin/structure/types/manage/{$content_type}/panelizer/{$view_mode}/{$panelizer_name}/settings");
+    $edit = array(
+      'css_class' => 'panelizer-clone',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Create a new test node.
+    $node = $this->createNode();
+
+    // Load the node page.
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertResponse(200);
+    $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => 'panelizer-original'));
+    $this->assertEqual(count($elements), 1, "The node is using the original display.");
+
+    // Update the node to use the cloned display.
+    $this->drupalGet('node/' . $node->nid . '/edit');
+    $this->assertResponse(200);
+    $edit = array(
+      'panelizer[' . $view_mode . '][name]' => 'node:' . $content_type . ':clone_of_default',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+    $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => 'panelizer-clone'));
+    $this->assertEqual(count($elements), 1, "The node is using the cloned display.");
+
+    // Update the node again to use the original display.
+    $this->drupalGet('node/' . $node->nid . '/edit');
+    $this->assertResponse(200);
+    $edit = array(
+      'panelizer[' . $view_mode . '][name]' => 'node:' . $content_type . ':default',
+    );
+    $this->drupalPost(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+    $elements = $this->xpath('//body[contains(@class,:class)]', array(':class' => 'panelizer-original'));
+    $this->assertEqual(count($elements), 1, "The node is using the original display again.");
   }
 
   /**

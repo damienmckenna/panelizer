@@ -1710,6 +1710,12 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
       $default_display = $this->get_default_display_default_name($bundle, $view_mode);
       if (empty($panelizer->display_is_modified)
           && !empty($panelizer->name) && $panelizer->name == $default_display) {
+        // Delete the existing record for this revision/entity if one existed
+        // before and a new revision was not being saved.
+        if (empty($entity->revision)) {
+          // Only delete the display for this specific revision.
+          $this->delete_entity_panelizer($entity, $view_mode, TRUE);
+        }
         continue;
       }
 
@@ -2528,33 +2534,44 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
    *
    * @param object $entity
    *   The entity.
-   * @param $view_mode
+   * @param string $view_mode
    *   The view mode to delete. If not specified, all view modes will be
    *   deleted.
+   * @param bool $one_revision
+   *   Whether to delete all revisions for this entity, or a specific one.
    */
-  function delete_entity_panelizer($entity, $view_mode = NULL) {
+  function delete_entity_panelizer($entity, $view_mode = NULL, $one_revision = FALSE) {
     list($entity_id, $revision_id, $bundle) = entity_extract_ids($this->entity_type, $entity);
 
-    // Locate and delete all displays associated with the entity.
-    if (empty($view_mode)) {
-      $dids = db_query("SELECT did FROM {panelizer_entity} WHERE entity_type = :type AND entity_id = :id", array(':type' => (string) $this->entity_type, ':id' => $entity_id))->fetchCol();
+    // Locate any displays associated with the entity.
+    $query = db_select('panelizer_entity', 'pe')
+      ->fields('pe', array('did'))
+      ->condition('entity_type', $this->entity_type)
+      ->condition('entity_id', $entity_id);
+    if (!empty($view_mode)) {
+      $query->condition('view_mode', $view_mode);
     }
-    else {
-      $dids = db_query("SELECT did FROM {panelizer_entity} WHERE entity_type = :type AND entity_id = :id AND view_mode = :view_mode", array(':type' => (string) $this->entity_type, ':id' => $entity_id, ':view_mode' => $view_mode))->fetchCol();
+    if (!empty($revision_id) && !empty($one_revision)) {
+      $query->condition('revision_id', $revision_id);
     }
+    $dids = $query->execute()
+      ->fetchCol();
 
+    // Delete the Panels displays.
     foreach (array_unique(array_filter($dids)) as $did) {
       panels_delete_display($did);
     }
 
+    // Delete the {panelizer_entity} records.
     $delete = db_delete('panelizer_entity')
       ->condition('entity_type', $this->entity_type)
       ->condition('entity_id', $entity_id);
-
-    if ($view_mode) {
+    if (!empty($view_mode)) {
       $delete->condition('view_mode', $view_mode);
     }
-
+    if (!empty($revision_id) && !empty($one_revision)) {
+      $delete->condition('revision_id', $revision_id);
+    }
     $delete->execute();
 
     // Reset the entity's cache. If the EntityCache module is enabled, this also

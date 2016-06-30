@@ -118,6 +118,9 @@ By DamienMcKenna: Updated the README.txt note about Pathauto.
 #2282605 by joelstein: Support for the core search system's custom view modes.
 #2757995 by mathieuhelie, Calystod: Support for Search API's alternative content
   language.
+#2758569 by DamienMcKenna: When changing a node from a non-default, non-custom
+  display to the entity's default display, the old {panelizer_entity} record
+  was not being removed so the change never took effect.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
