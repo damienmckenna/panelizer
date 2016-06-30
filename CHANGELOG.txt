@@ -116,6 +116,8 @@ By DamienMcKenna: Updated the README.txt note about Pathauto.
   correctly.
 #2757277 by DamienMcKenna: Resetting a display didn't work correctly.
 #2282605 by joelstein: Support for the core search system's custom view modes.
+#2757995 by mathieuhelie, Calystod: Support for Search API's alternative content
+  language.
 
 
 Panelizer 7.x-3.2-beta1, 2015-02-02
