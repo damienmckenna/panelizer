@@ -1,3 +1,7 @@
+Panelizer 7.x-3.x-dev, xxxx-xx-xx
+---------------------------------
+
+
 Panelizer 7.x-3.2, 2016-06-30
 -----------------------------
 #2416977 by Andrew M Riley: Confirm Navigation: Leave this Page (IPE w/
