@@ -1,5 +1,6 @@
 Panelizer 7.x-3.x-dev, xxxx-xx-xx
 ---------------------------------
+#2762351 by DamienMcKenna: Skip update 7300 if there are no records to process.
 
 
 Panelizer 7.x-3.2, 2016-06-30
