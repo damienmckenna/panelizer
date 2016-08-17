@@ -261,7 +261,11 @@ class PanelizerWithPanelsIPE extends PanelizerTestHelper {
     $this->assertLink(t('Customize this page'));
     $path = 'panels/ajax/ipe/save_form/panelizer%3Anode%3A' . $node->nid . '%3Apage_manager%3A' . $node->vid;
     $query_string = array('destination' => 'node/' . $node->nid);
-    $this->assertLinkByHref(base_path() . $path . '?destination=' . $query_string['destination']);
+    $full_path = base_path() . $path . '?destination=' . $query_string['destination'];
+    $this->assertLinkByHref($full_path);
+    $xpath = $this->xpath("//a[@id='panels-ipe-customize-page']");
+    $this->assertEqual(count($xpath), 1, 'Found the "Customize this page" link.');
+    $this->assertEqual($xpath[0]['href'], $full_path);//, 'The "Customize this Page" link is what was expected.');
 
     // Log out.
     $this->drupalLogout();
@@ -294,13 +298,15 @@ class PanelizerWithPanelsIPE extends PanelizerTestHelper {
     $this->assertNoLink(t('Customize this page'));
     $path = 'panels/ajax/ipe/save_form/panelizer%3Anode%3A' . $node->nid . '%3Apage_manager%3A' . $node->vid;
     $query_string = array('destination' => 'node/' . $node->nid);
-    $this->assertNoLinkByHref(base_path() . $path . '?destination=' . $query_string['destination']);
+    $full_path = base_path() . $path . '?destination=' . $query_string['destination'];
+    $this->assertNoLinkByHref($full_path);
 
     // Confirm the IPE link is not on the form.
     $this->assertNoLink(t('Change layout'));
     $path = 'panels/ajax/ipe/change_layout/panelizer%3Anode%3A' . $node->nid . '%3Apage_manager%3A' . $node->vid;
     $query_string = array('destination' => 'node/' . $node->nid);
-    $this->assertNoLinkByHref(base_path() . $path . '?destination=' . $query_string['destination']);
+    $full_path = base_path() . $path . '?destination=' . $query_string['destination'];
+    $this->assertNoLinkByHref($full_path);
   }
 
 }
