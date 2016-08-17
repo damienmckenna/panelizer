@@ -34,6 +34,9 @@ files[] = tests/panelizer.node_revisions.test
 ; Tests: Standard node translations.
 files[] = tests/panelizer.node_content_translation.test
 
+; Tests: Panels IPE.
+files[] = tests/panelizer.with_panels_ipe.test
+
 ; Todo: Tests: Pathauto integration.
 test_dependencies[] = pathauto
 files[] = tests/panelizer.with_pathauto.test
