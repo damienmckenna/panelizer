@@ -1,5 +1,5 @@
-Panelizer 7.x-3.x-dev, xxxx-xx-xx
----------------------------------
+Panelizer 7.x-3.3, 2016-08-17
+-----------------------------
 #2762351 by DamienMcKenna: Skip update 7300 if there are no records to process.
 By dsnopek, japerry, mpotter, DamienMcKenna: Add support for the new Panels
   Storage API.
