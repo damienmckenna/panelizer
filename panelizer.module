@@ -163,6 +163,25 @@ function panelizer_admin_paths() {
 }
 
 /**
+ * Implements hook_panels_ipe_access().
+ */
+function panelizer_panels_ipe_access($display) {
+  // We only care about Panels displays from panelizer.
+  if (isset($display->context['panelizer'])) {
+    // The type array contains 3 elements, where the first is the full context
+    // type (ie. 'entity:ENTITY_TYPE'), and the remaining two are the parts
+    // seperated by ':', so 'entity' and the entity type name.
+    $entity_type = $display->context['panelizer']->type[2];
+    if ($handler = panelizer_entity_plugin_get_handler($entity_type)) {
+      // Only allow access to use the IPE if the user has 'update' access to
+      // the underlying entity.
+      $entity = $display->context['panelizer']->data;
+      return $handler->entity_access('update', $entity);
+    }
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * Check whether a given view mode is panelized. Set an error message if there
