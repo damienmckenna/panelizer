@@ -1,8 +1,8 @@
 name = Panelizer
 description = Allow any node type to have custom panel displays, similar to the panel node type.
 package = "Panels"
-dependencies[] = panels (>= 3.5)
-dependencies[] = ctools (>= 1.9)
+dependencies[] = panels
+dependencies[] = ctools
 dependencies[] = page_manager
 core = 7.x
 configure = admin/structure/panelizer
@@ -33,6 +33,9 @@ files[] = tests/panelizer.node_revisions.test
 
 ; Tests: Standard node translations.
 files[] = tests/panelizer.node_content_translation.test
+
+; Tests: Exportables.
+files[] = tests/panelizer.exportables.test
 
 ; Tests: Panels IPE.
 files[] = tests/panelizer.with_panels_ipe.test

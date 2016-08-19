@@ -93,7 +93,7 @@ class PanelizerWithPanelsIPE extends PanelizerTestHelper {
     // Load the API path when logged in. This should give an AJAX response with
     // two commands - the first should be "settings" and the second one should
     // be "initIPE".
-    $json = $this->drupalGetAJAX(urldecode($path), array('query' => $query_string));
+    $json = $this->drupalGetAJAX($path, array('query' => $query_string));
     $this->assertResponse(200);
     $this->verbose('<pre>' . print_r($json, TRUE) . '</pre>');
     // @todo What permission does this need to get a proper response?
@@ -115,7 +115,7 @@ class PanelizerWithPanelsIPE extends PanelizerTestHelper {
 
     // Load the API path when logged out. This should give a 404-by-AJAX
     // response.
-    $json = $this->drupalGetAJAX(urldecode($path), array('query' => $query_string));
+    $json = $this->drupalGetAJAX($path, array('query' => $query_string));
     $this->assertResponse(200);
     $this->verbose('<pre>' . print_r($json, TRUE) . '</pre>');
     $this->assertEqual(count($json), 2);
@@ -187,7 +187,7 @@ class PanelizerWithPanelsIPE extends PanelizerTestHelper {
     // Load the API path when logged in. This should give an AJAX response with
     // three commands - the first should be "settings", the second one should be
     // "modal_display" and the third "IPEsetLockState".
-    $json = $this->drupalGetAJAX(urldecode($path), array('query' => $query_string));
+    $json = $this->drupalGetAJAX($path, array('query' => $query_string));
     $this->assertResponse(200);
     $this->verbose('<pre>' . print_r($json, TRUE) . '</pre>');
     // @todo What permission does this need to get a proper response?
@@ -212,7 +212,7 @@ class PanelizerWithPanelsIPE extends PanelizerTestHelper {
 
     // Load the API path when logged out. This should give a 404-by-AJAX
     // response.
-    $json = $this->drupalGetAJAX(urldecode($path), array('query' => $query_string));
+    $json = $this->drupalGetAJAX($path, array('query' => $query_string));
     $this->assertResponse(200);
     $this->verbose('<pre>' . print_r($json, TRUE) . '</pre>');
     $this->assertEqual(count($json), 2);

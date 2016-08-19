@@ -6,6 +6,9 @@ Panelizer 7.x-3.x-dev, xxxx-xx-xx
   panelizer_update_7303() to avoid infinite loops.
 #2193221 by michel.g: 'Undefined index' errors because the 'help' variable is
   not always present.
+#2785945 by dsnopek, DamienMcKenna, mpotter, czigor: Fixed access-denied problem
+  caused by needing to add the new Panels Storage API attributes to exported
+  defaults.
 
 
 Panelizer 7.x-3.3, 2016-08-17
