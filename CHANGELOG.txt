@@ -1,5 +1,5 @@
-Panelizer 7.x-3.x-dev, xxxx-xx-xx
----------------------------------
+Panelizer 7.x-3.4, 2016-08-19
+-----------------------------
 #2785821 by DamienMcKenna: Resolve issues with tests running on drupalci.
 #2785793 by attiks: Fix errors in panelizer_update_7115().
 #2785883 by DamienMcKenna, pbuyle, attiks, FeyP, smaz: Fixes for
