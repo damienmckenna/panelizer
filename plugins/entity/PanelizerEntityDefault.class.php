@@ -3290,7 +3290,10 @@ abstract class PanelizerEntityDefault implements PanelizerEntityInterface {
         'view modes' => array(),
       );
       if (!empty($values[0]['status'])) {
-        $settings['help'] = $values[0]['help'];
+        //This field is optional so should not always be applied.
+        if (isset($values[0]['help']) && !empty($values[0]['help'])) {
+          $settings['help'] = $values[0]['help'];
+        }
 
         foreach ($values as $view_mode => $config) {
           if (!empty($view_mode) && !empty($config)) {

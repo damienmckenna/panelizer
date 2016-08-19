@@ -4,6 +4,8 @@ Panelizer 7.x-3.x-dev, xxxx-xx-xx
 #2785793 by attiks: Fix errors in panelizer_update_7115().
 #2785883 by DamienMcKenna, pbuyle, attiks, FeyP, smaz: Fixes for
   panelizer_update_7303() to avoid infinite loops.
+#2193221 by michel.g: 'Undefined index' errors because the 'help' variable is
+  not always present.
 
 
 Panelizer 7.x-3.3, 2016-08-17
