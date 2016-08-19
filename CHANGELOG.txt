@@ -11,6 +11,7 @@ Panelizer 7.x-3.x-dev, xxxx-xx-xx
   defaults.
 #2786471 by mpotter, dsnopek: Fixed multilingual issue with the Search API
   integration.
+By DamienMcKenna: Require Panels 7.x-3.6.
 
 
 Panelizer 7.x-3.3, 2016-08-17
