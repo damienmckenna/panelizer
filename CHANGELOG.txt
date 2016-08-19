@@ -9,6 +9,8 @@ Panelizer 7.x-3.x-dev, xxxx-xx-xx
 #2785945 by dsnopek, DamienMcKenna, mpotter, czigor: Fixed access-denied problem
   caused by needing to add the new Panels Storage API attributes to exported
   defaults.
+#2786471 by mpotter, dsnopek: Fixed multilingual issue with the Search API
+  integration.
 
 
 Panelizer 7.x-3.3, 2016-08-17
