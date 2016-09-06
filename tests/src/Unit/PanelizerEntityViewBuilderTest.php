@@ -245,10 +245,10 @@ class PanelizerEntityViewBuilderTest extends UnitTestCase {
       'expected' => [
         123 => [
           '#theme' => [
-            'panelizer_view_mode',
-            'panelizer_view_mode__entity_type_id',
-            'panelizer_view_mode__entity_type_id__abc',
             'panelizer_view_mode__entity_type_id__123',
+            'panelizer_view_mode__entity_type_id__abc',
+            'panelizer_view_mode__entity_type_id',
+            'panelizer_view_mode',
           ],
           '#panelizer_plugin' => $this->panelizerPlugin->reveal(),
           '#panels_display' => $panels_display->reveal(),

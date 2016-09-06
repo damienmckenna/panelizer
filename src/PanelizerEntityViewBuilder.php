@@ -375,10 +375,10 @@ class PanelizerEntityViewBuilder implements EntityViewBuilderInterface, EntityHa
 
     $build = [
       '#theme' => [
-        'panelizer_view_mode',
-        'panelizer_view_mode__' . $this->entityTypeId,
-        'panelizer_view_mode__' . $this->entityTypeId . '__' . $entity->bundle(),
         'panelizer_view_mode__' . $this->entityTypeId . '__' . $entity->id(),
+        'panelizer_view_mode__' . $this->entityTypeId . '__' . $entity->bundle(),
+        'panelizer_view_mode__' . $this->entityTypeId,
+        'panelizer_view_mode',
       ],
       '#panelizer_plugin' => $this->getPanelizerPlugin(),
       '#panels_display' => $panels_display,
