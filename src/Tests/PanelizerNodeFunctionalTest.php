@@ -50,7 +50,6 @@ class PanelizerNodeFunctionalTest extends WebTestBase {
       'create page content',
       'administer panelizer',
       'access panels in-place editing',
-      'use panels in place editing',
     ]);
     $this->drupalLogin($user);
 
