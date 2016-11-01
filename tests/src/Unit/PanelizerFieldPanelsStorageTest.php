@@ -211,8 +211,8 @@ class PanelizerFieldPanelsStorageTest extends UnitTestCase {
     $account = $this->prophesize(AccountInterface::class);
 
     $entity = $this->prophesize(FieldableEntityInterface::class);
-    $entity->access('read', $account->reveal())
-      ->willReturn(TRUE);
+    $entity->access('view', $account->reveal(), TRUE)
+      ->willReturn(AccessResult::allowed());
 
     $this->storage->load('123')->willReturn($entity->reveal());
 
@@ -245,8 +245,8 @@ class PanelizerFieldPanelsStorageTest extends UnitTestCase {
     $account = $this->prophesize(AccountInterface::class);
 
     $entity = $this->prophesize(FieldableEntityInterface::class);
-    $entity->access('update', $account->reveal())
-      ->willReturn(TRUE);
+    $entity->access('update', $account->reveal(), TRUE)
+      ->willReturn(AccessResult::allowed());
 
     $this->storage->load('123')->willReturn($entity->reveal());
 
@@ -255,7 +255,8 @@ class PanelizerFieldPanelsStorageTest extends UnitTestCase {
     $this->panelizer->hasEntityPermission('change content', $entity->reveal(), 'view_mode', $account->reveal())
       ->willReturn(TRUE);
 
-    $this->assertEquals(AccessResult::allowed(), $this->panelsStorage->access('entity_type_id:123:view_mode', 'update', $account->reveal()));
+    $access = $this->panelsStorage->access('entity_type_id:123:view_mode', 'update', $account->reveal());
+    $this->assertEquals(AccessResult::allowed(), $access);
   }
 
   /**
@@ -266,8 +267,8 @@ class PanelizerFieldPanelsStorageTest extends UnitTestCase {
     $account = $this->prophesize(AccountInterface::class);
 
     $entity = $this->prophesize(FieldableEntityInterface::class);
-    $entity->access('update', $account->reveal())
-      ->willReturn(TRUE);
+    $entity->access('update', $account->reveal(), TRUE)
+      ->willReturn(AccessResult::allowed());
 
     $this->storage->load('123')->willReturn($entity->reveal());
 
