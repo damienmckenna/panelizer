@@ -353,6 +353,13 @@ class PanelizerEntityViewBuilder implements EntityViewBuilderInterface, EntityHa
     foreach ($entities as $id => $entity) {
       $panels_display = $this->panelizer->getPanelsDisplay($entity, $view_mode, $displays[$entity->bundle()]);
       $build[$id] = $this->buildPanelized($entity, $panels_display, $view_mode, $langcode);
+
+      // Allow modules to modify the render array.
+      $alter_types = array(
+        "{$this->entityTypeId}_view",
+        'entity_view',
+      );
+      $this->moduleHandler->alter($alter_types, $build[$id], $entity, $displays[$entity->bundle()]);
     }
 
     return $build;
