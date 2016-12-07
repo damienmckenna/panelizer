@@ -30,7 +30,7 @@ use Drupal\Tests\UnitTestCase;
  *
  * @coversDefaultClass \Drupal\panelizer\PanelizerEntityViewBuilder
  *
- * @group Panelizer
+ * @group panelizer
  */
 class PanelizerEntityViewBuilderTest extends UnitTestCase {
 
@@ -233,9 +233,26 @@ class PanelizerEntityViewBuilderTest extends UnitTestCase {
       '@panelizer.entity_context:entity' => $entity_context->reveal(),
     ])->shouldBeCalled();
     $panels_display->build()->willReturn(['#markup' => 'Panelized']);
+
+    $this->panelizer
+      ->getPanelizerSettings('entity_type_id', 'abc', 'full', $display1->reveal())
+      ->willReturn([
+        'default' => 'default',
+      ]);
+
+    $this->panelizer
+      ->getDisplayStaticContexts('default', 'entity_type_id', 'abc', 'full', $display1->reveal())
+      ->willReturn([
+        'other' => $other_context->reveal(),
+        '@panelizer.entity_context:entity' => $entity_context->reveal(),
+      ]);
+
     $this->panelizer->getPanelsDisplay($entity1->reveal(), 'full', $display1->reveal())
       ->willReturn($panels_display->reveal());
 
+    $panels_display->getCacheContexts()->willReturn([]);
+    $panels_display->getCacheTags()->willReturn([]);
+    $panels_display->getCacheMaxAge()->willReturn(-1);
 
     return [
       'entities' => [

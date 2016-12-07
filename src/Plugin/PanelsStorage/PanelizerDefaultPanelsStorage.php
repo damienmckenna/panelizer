@@ -122,12 +122,19 @@ class PanelizerDefaultPanelsStorage extends PanelsStorageBase implements Contain
    * @param \Drupal\Core\Entity\EntityInterface|NULL $entity
    *   The entity.
    *
-   * @return \Drupal\Core\Plugin\Context\Context
-   *   The context.
+   * @return \Drupal\Core\Plugin\Context\Context[]
+   *   The available contexts.
    */
   protected function getEntityContext($entity_type_id, EntityInterface $entity = NULL) {
-    return new Context(new ContextDefinition('entity:' . $entity_type_id, NULL, TRUE), $entity);
+    $contexts = [];
+    // Set a placeholder context so that the calling code knows that we need
+    // an entity context. If we have the value available, then we actually set
+    // the context value.
+    $contexts['@panelizer.entity_context:entity'] = new Context(new ContextDefinition('entity:' . $entity_type_id, NULL, TRUE), $entity);
+    return $contexts;
   }
+
+
 
   /**
    * {@inheritdoc}
@@ -136,12 +143,8 @@ class PanelizerDefaultPanelsStorage extends PanelsStorageBase implements Contain
     try {
       list ($entity_type_id, $bundle, $view_mode, $name, $entity) = $this->parseId($id);
       if ($panels_display = $this->panelizer->getDefaultPanelsDisplay($name, $entity_type_id, $bundle, $view_mode)) {
-        // Set a placeholder context so that the calling code knows that we need
-        // an entity context. If we have the value available, then we actually set
-        // the context value.
-        $contexts = [
-          '@panelizer.entity_context:entity' => $this->getEntityContext($entity_type_id, $entity),
-        ];
+        $contexts = $this->getEntityContext($entity_type_id, $entity);
+        $contexts = $contexts + $this->panelizer->getDisplayStaticContexts($name, $entity_type_id, $bundle, $view_mode);
         $panels_display->setContexts($contexts);
         return $panels_display;
       }

@@ -134,9 +134,21 @@ class PanelizerFieldPanelsStorage extends PanelsStorageBase implements Container
     $id = $panels_display->getStorageId();
     if ($entity = $this->loadEntity($id)) {
       list (,, $view_mode) = explode(':', $id);
+      // If we're dealing with an entity that has a documented default, we
+      // don't want to lose that information when we save our customizations.
+      // This enables us to revert to the correct default at a later date.
       if ($entity instanceof FieldableEntityInterface) {
+        $default = NULL;
+        if ($entity->hasField('panelizer') && $entity->panelizer->first()) {
+          foreach ($entity->panelizer as $item) {
+            if ($item->view_mode == $view_mode) {
+              $default = $item->default;
+              break;
+            }
+          }
+        }
         try {
-          $this->panelizer->setPanelsDisplay($entity, $view_mode, NULL, $panels_display);
+          $this->panelizer->setPanelsDisplay($entity, $view_mode, $default, $panels_display);
         }
         catch (PanelizerException $e) {
           // Translate to expected exception type.

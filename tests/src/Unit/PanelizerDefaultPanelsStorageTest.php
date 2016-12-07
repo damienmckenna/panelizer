@@ -16,10 +16,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\panelizer\Exception\PanelizerException;
 use Drupal\panelizer\Panelizer;
 use Drupal\panelizer\Plugin\PanelsStorage\PanelizerDefaultPanelsStorage;
-use Drupal\panels\Plugin\PanelsStorage\PageManagerPanelsStorage;
 use Drupal\panels\Plugin\DisplayVariant\PanelsDisplayVariant;
 use Drupal\Tests\UnitTestCase;
-use Prophecy\Argument;
 
 /**
  * Tests the PanelizerDefaultPanelsStorage service.
@@ -89,9 +87,15 @@ class PanelizerDefaultPanelsStorageTest extends UnitTestCase {
     $this->panelizer->getDefaultPanelsDisplay('default', 'entity_type_id', 'bundle', 'view_mode', NULL)
       ->willReturn($panels_display->reveal());
 
+    $this->panelizer
+      ->getDisplayStaticContexts('default', 'entity_type_id', 'bundle', 'view_mode')
+      ->willReturn([]);
+
     $this->panelsStorage->method('getEntityContext')
       ->with($this->equalTo('entity_type_id'), $this->isNull())
-      ->willReturn($entity_context->reveal());
+      ->willReturn([
+        '@panelizer.entity_context:entity' => $entity_context->reveal(),
+      ]);
 
     $this->assertSame($panels_display->reveal(), $this->panelsStorage->load('entity_type_id:bundle:view_mode:default'));
   }
@@ -110,13 +114,19 @@ class PanelizerDefaultPanelsStorageTest extends UnitTestCase {
     $this->panelizer->getDefaultPanelsDisplay('default', 'entity_type_id', 'bundle', 'view_mode', NULL)
       ->willReturn($panels_display->reveal());
 
+    $this->panelizer
+      ->getDisplayStaticContexts('default', 'entity_type_id', 'bundle', 'view_mode')
+      ->willReturn([]);
+
     $entity = $this->prophesize(EntityInterface::class);
     $entity->bundle()->willReturn("bundle");
     $this->storage->load('123')->willReturn($entity->reveal())->shouldBeCalled();
 
     $this->panelsStorage->method('getEntityContext')
       ->with($this->equalTo('entity_type_id'), $entity->reveal())
-      ->willReturn($entity_context->reveal());
+      ->willReturn([
+        '@panelizer.entity_context:entity' => $entity_context->reveal(),
+      ]);
 
     $this->assertSame($panels_display->reveal(), $this->panelsStorage->load('*entity_type_id:123:view_mode:default'));
   }
