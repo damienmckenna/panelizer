@@ -195,6 +195,13 @@ function panelizer_panels_ipe_panels_display_presave(PanelsDisplayVariant $panel
       }
     }
 
+    // We need to generate a new UUID if we're creating a custom display.
+    if ($current_storage == 'panelizer_default' && $panelizer_save_as == 'panelizer_field') {
+      $configuration = $panels_display->getConfiguration();
+      $configuration['uuid'] = \Drupal::service('uuid')->generate();
+      $panels_display->setConfiguration($configuration);
+    }
+
     // Set the new storage information.
     $panels_display->setStorage($panelizer_save_as, $panelizer_entity[$panelizer_save_as . '_storage_id']);
   }
