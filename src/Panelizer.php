@@ -314,7 +314,7 @@ class Panelizer implements PanelizerInterface {
       $panelizer_item->default = $default;
 
       // Create a new revision if possible.
-      if ($entity instanceof RevisionableInterface) {
+      if ($entity instanceof RevisionableInterface && $entity->getEntityType()->isRevisionable()) {
         if ($entity->isDefaultRevision()) {
           $entity->setNewRevision(TRUE);
         }

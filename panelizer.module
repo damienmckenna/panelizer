@@ -109,7 +109,7 @@ function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_disp
 
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $panels_display->getContexts()['@panelizer.entity_context:entity']->getContextValue();
-    $revision_id = ($entity instanceof RevisionableInterface) && !$entity->isDefaultRevision() ? $entity->getRevisionId() : NULL;
+    $revision_id = ($entity instanceof RevisionableInterface && $entity->getEntityType()->isRevisionable()) && !$entity->isDefaultRevision() ? $entity->getRevisionId() : NULL;
     list (,, $view_mode) = explode(':', $panels_display->getStorageId());
 
     // Get the default storage id.

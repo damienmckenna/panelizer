@@ -1,5 +1,7 @@
 Panelizer 8.x-3.x-dev, xxxx-xx-xx
 ---------------------------------
+#2828840 by hctom, DamienMcKenna: Handle entity types that use
+  RevisionableInterface but are not revisionable.
 
 
 Panelizer 8.x-3.0-alpha3, 2016-12-15
