@@ -2,6 +2,8 @@ Panelizer 8.x-3.x-dev, xxxx-xx-xx
 ---------------------------------
 #2828840 by hctom, DamienMcKenna: Handle entity types that use
   RevisionableInterface but are not revisionable.
+#2664574 by artreaktor, phenaproxima, hctom, jiff, floretan: Add support for
+  Taxonomy Term entities.
 
 
 Panelizer 8.x-3.0-alpha3, 2016-12-15

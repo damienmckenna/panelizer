@@ -7,6 +7,7 @@
 namespace Drupal\panelizer;
 
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -559,9 +560,13 @@ class Panelizer implements PanelizerInterface {
   public function getPermissions() {
     $permissions = [];
 
-    $definitions = $this->panelizerEntityManager->getDefinitions();
-    foreach (array_keys($definitions) as $entity_type_id) {
-      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
+    // Only look at entity types that have a corresponding Panelizer plugin.
+    $entity_types = array_intersect_key(
+      $this->entityTypeManager->getDefinitions(),
+      $this->panelizerEntityManager->getDefinitions()
+    );
+
+    foreach ($entity_types as $entity_type_id => $entity_type) {
       $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
       foreach ($bundles as $bundle => $bundle_info) {
         $permissions["administer panelizer $entity_type_id $bundle defaults"] = [
