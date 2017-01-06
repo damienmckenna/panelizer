@@ -1,3 +1,7 @@
+Panelizer 8.x-3.x-dev, xxxx-xx-xx
+---------------------------------
+
+
 Panelizer 8.x-3.0-alpha3, 2016-12-15
 ------------------------------------
 #2664648: Added unit tests for PanelizerDefaultPanelsStorage and
