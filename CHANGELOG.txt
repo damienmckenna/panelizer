@@ -4,6 +4,7 @@ Panelizer 8.x-3.x-dev, xxxx-xx-xx
   RevisionableInterface but are not revisionable.
 #2664574 by artreaktor, phenaproxima, hctom, jiff, floretan: Add support for
   Taxonomy Term entities.
+#2835590 by DamienMcKenna: Hide the custom Panelizer field, it's no longer used.
 
 
 Panelizer 8.x-3.0-alpha3, 2016-12-15

@@ -210,7 +210,7 @@ function panelizer_panels_ipe_panels_display_presave(PanelsDisplayVariant $panel
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function panelizer_form_entity_view_display_edit_form_alter(&$form, FormStateInterface $form_state) {
+function panelizer_form_entity_view_display_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
   $form_object = $form_state->getFormObject();
   /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display */
@@ -345,6 +345,17 @@ function panelizer_form_entity_view_display_edit_submit(&$form, FormStateInterfa
       $local_action_manager->getDefinitions();
       \Drupal::service('cache.render')->invalidateAll();
     }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for field_ui_field_storage_add_form().
+ */
+function panelizer_form_field_ui_field_storage_add_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Hide the legacy Panelizer field.
+  // @todo Remove the Panelizer field entirely.
+  if (isset($form['add']['new_storage_type']['#options']['General']['panelizer'])) {
+    unset($form['add']['new_storage_type']['#options']['General']['panelizer']);
   }
 }
 
