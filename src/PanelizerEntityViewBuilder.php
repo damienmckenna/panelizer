@@ -265,6 +265,9 @@ class PanelizerEntityViewBuilder implements EntityViewBuilderInterface, EntityHa
    * {@inheritdoc}
    */
   public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
+    // Trigger hook_panelizer_pre_view_builder_alter().
+    $this->moduleHandler->alter('panelizer_pre_view_builder', $view_mode, $entity, $langcode);
+
     $displays = $this->collectRenderDisplays([$entity], $view_mode);
     $display = $displays[$entity->bundle()];
 
