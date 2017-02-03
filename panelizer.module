@@ -146,11 +146,16 @@ function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_disp
       'panelizer_default_real_storage_id' => $panelizer_default_storage_id,
     ];
 
+    // Whether or not the current user has access to the "set as default" action
+    // in the IPE; any user with the 'administer panelizer' will also have
+    // access.
+    $user = \Drupal::currentUser();
+    $build['#attached']['drupalSettings']['panelizer']['user_permission']['save_default'] = $user->hasPermission('set panelizer default') || $user->hasPermission('administer panelizer');
 
     if ($panels_display->getStorageType() == 'panelizer_field') {
-      // If using panelizer_field, we change the storage id to match what we
-      // put together here because it'll have the revision id omitted in the
-      // right situation.
+      // If using panelizer_field, we change the storage id to match what we put
+      // together here because it'll have the revision id omitted in the right
+      // situation.
       $build['#attached']['drupalSettings']['panels_ipe']['panels_display']['storage_id'] = $panelizer_field_storage_id;
     }
     else {
