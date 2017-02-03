@@ -9,6 +9,8 @@ Panelizer 8.x-3.x-dev, xxxx-xx-xx
   rendered.
 #2847351 by porchlight, rvillan, DamienMcKenna: Permission to 'Set as Default'
   in the Panelizer IPE.
+#2727629 by samuel.mortenson, Dane Powell, dsnopek: Panelized nodes sporadically
+  become locked.
 
 
 Panelizer 8.x-3.0-alpha3, 2016-12-15

@@ -9,6 +9,7 @@ namespace Drupal\panelizer;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -319,6 +320,11 @@ class Panelizer implements PanelizerInterface {
         if ($entity->isDefaultRevision()) {
           $entity->setNewRevision(TRUE);
         }
+      }
+
+      // Updates the changed time of the entity, if necessary.
+      if ($entity->getEntityType()->isSubclassOf(EntityChangedInterface::class)) {
+        $entity->setChangedTime(REQUEST_TIME);
       }
 
       $entity->panelizer[$panelizer_item->getName()] = $panelizer_item;
