@@ -7,8 +7,7 @@ example, this allows each node display to be customized individually.
 
 Features
 --------------------------------------------------------------------------------
-* Supports Drupal core's included entities - nodes, taxonomy terms, users
-  and comments. (More may be available in the future)
+* Supports Drupal core's included entities - nodes, taxonomy terms and users.
 
 * Can be easily extended to support additional entities.
 
