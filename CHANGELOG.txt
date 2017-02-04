@@ -11,6 +11,8 @@ Panelizer 8.x-3.x-dev, xxxx-xx-xx
   in the Panelizer IPE.
 #2727629 by samuel.mortenson, Dane Powell, dsnopek: Panelized nodes sporadically
   become locked.
+#2664572 by hctom, balsama, smurrayatwork, DamienMcKenna: Support for user
+  entities.
 
 
 Panelizer 8.x-3.0-alpha3, 2016-12-15
