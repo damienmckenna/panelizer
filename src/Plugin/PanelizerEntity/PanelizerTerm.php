@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\panelizer\Plugin\PanelizerEntity\PanelizerTerm.
- */
-
 namespace Drupal\panelizer\Plugin\PanelizerEntity;
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -47,10 +42,10 @@ class PanelizerTerm extends PanelizerEntityBase {
     parent::alterBuild($build, $entity, $panels_display, $view_mode);
 
     if ($entity->id()) {
-      $build['#contextual_links']['taxonomy_term'] = array(
-        'route_parameters' =>array('taxonomy_term' => $entity->id()),
-        'metadata' => array('changed' => $entity->getChangedTime()),
-      );
+      $build['#contextual_links']['taxonomy_term'] = [
+        'route_parameters' => ['taxonomy_term' => $entity->id()],
+        'metadata' => ['changed' => $entity->getChangedTime()],
+      ];
     }
   }
 

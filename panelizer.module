@@ -261,26 +261,27 @@ function panelizer_form_entity_view_display_edit_form_alter(&$form, FormStateInt
 
     $form['panelizer']['options']['custom'] = [
       '#type' => 'checkbox',
-      '#title' => t('Allow custom layouts for individual @entities', [
-        '@entities' => $entity_type->getPluralLabel(),
+      '#title' => t('Allow each @entity to have its display customized', [
+        '@entity' => $entity_type->getSingularLabel(),
       ]),
       '#default_value' => isset($settings['custom']) ? $settings['custom'] : FALSE,
     ];
     $form['panelizer']['options']['allow'] = [
       '#type' => 'checkbox',
-      '#title' => t('Allow users to select which layout to use'),
-      '#description' => t('When multiple defaults for a view mode are available it can be useful to allow content creators to choose which layout to use for a given @entity.', [
+      '#title' => t('Allow users to select which display to use'),
+      '#description' => t('When multiple default displays are available for a view mode it can be useful to allow content creators to choose which display to use for an individual @entity.', [
         '@entity' => $entity_type->getSingularLabel(),
       ]),
       '#default_value' => isset($settings['allow']) ? $settings['allow'] : FALSE,
     ];
 
-    // If this display mode is panelized, then show a link to its settings.
+    // If this display mode is panelized, then show the available displays in a
+    // table.
     if (!empty($settings['enable'])) {
       $form['#cache']['tags'][] = "panelizer_default:$entity_type_id:$bundle:$mode";
       $form['panelizer']['displays'] = [
         '#type' => 'table',
-        '#caption' => t('Panelized Displays'),
+        '#caption' => t('Default displays available for this view mode'),
         '#header' => [t('Name'), t('Use as default'), t('Operations')],
       ];
       foreach ($display->getThirdPartySetting('panelizer', 'displays', []) as $machine_name => $panels_display) {

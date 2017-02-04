@@ -57,11 +57,12 @@ class PanelizerUserFunctionalTest extends WebTestBase {
     // Enable Panelizer for this entity.
     $this->drupalGet('admin/config/people/accounts/display');
     $this->assertResponse(200);
-    $args = [
+    $edit = [
       'panelizer[enable]' => TRUE,
       'panelizer[custom]' => TRUE,
     ];
-    $this->drupalPostForm(NULL, $args, t('Save'));
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
 
     // Reload all caches.
     $this->rebuildAll();
@@ -88,6 +89,7 @@ class PanelizerUserFunctionalTest extends WebTestBase {
 
     // Check the user entity page.
     $out = $this->drupalGet('user/' . $account->id());
+    $this->assertResponse(200);
     $this->verbose($out);
 
     // Verify that 

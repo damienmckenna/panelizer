@@ -47,10 +47,10 @@ class PanelizerUser extends PanelizerEntityBase {
     parent::alterBuild($build, $entity, $panels_display, $view_mode);
 
     if ($entity->id()) {
-      $build['#contextual_links']['user'] = array(
-        'route_parameters' =>array('user' => $entity->id()),
-        'metadata' => array('changed' => $entity->getChangedTime()),
-      );
+      $build['#contextual_links']['user'] = [
+        'route_parameters' => ['user' => $entity->id()],
+        'metadata' => ['changed' => $entity->getChangedTime()],
+      ];
     }
 
     // This function adds a default alt tag to the user_picture field to

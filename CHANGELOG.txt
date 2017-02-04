@@ -14,6 +14,7 @@ Panelizer 8.x-3.x-dev, xxxx-xx-xx
 #2664572 by hctom, balsama, smurrayatwork, DamienMcKenna: Support for user
   entities.
 By DamienMcKenna: Does not support comment entities.
+#2835587 by DamienMcKenna: Minor UX tweaks, code improvements.
 
 
 Panelizer 8.x-3.0-alpha3, 2016-12-15

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\panelizer\Plugin\Field\FieldType\PanelizerFieldType.
- */
-
 namespace Drupal\panelizer\Plugin\Field\FieldType;
 
 use Drupal\Core\Entity\RevisionableInterface;

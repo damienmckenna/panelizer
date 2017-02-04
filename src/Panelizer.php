@@ -1,11 +1,6 @@
 <?php
-/**
- * @file
- * Contains \Drupal\panelizer\Panelizer
- */
 
 namespace Drupal\panelizer;
-
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -168,7 +163,7 @@ class Panelizer implements PanelizerInterface {
     // Check the existence and status of:
     // - the display for the view mode,
     // - the 'default' display.
-    $candidate_ids = array();
+    $candidate_ids = [];
     if ($view_mode != 'default') {
       $candidate_ids[] = $entity_type_id . '.' . $bundle . '.' . $view_mode;
     }
@@ -193,20 +188,20 @@ class Panelizer implements PanelizerInterface {
       $display = $storage->load($load_id);
     }
     else {
-      $display = $storage->create(array(
+      $display = $storage->create([
         'targetEntityType' => $entity_type_id,
         'bundle' => $bundle,
         'mode' => $view_mode,
         'status' => TRUE,
-      ));
+      ]);
     }
 
     // Let modules alter the display.
-    $display_context = array(
+    $display_context = [
       'entity_type' => $entity_type_id,
       'bundle' => $bundle,
       'view_mode' => $view_mode,
-    );
+    ];
     $this->moduleHandler->alter('entity_view_display', $display, $display_context);
 
     return $display;
@@ -576,10 +571,10 @@ class Panelizer implements PanelizerInterface {
       $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
       foreach ($bundles as $bundle => $bundle_info) {
         $permissions["administer panelizer $entity_type_id $bundle defaults"] = [
-          'title' => t('%entity_name %bundle_name: Administer Panelizer default panels, allowed content and settings.', array(
+          'title' => t('%entity_name %bundle_name: Administer Panelizer default panels, allowed content and settings.', [
             '%entity_name' => $entity_type->getLabel(),
             '%bundle_name' => $bundle_info['label'],
-          )),
+          ]),
           'description' => t('Users with this permission can fully administer panelizer for this entity bundle.'),
         ];
 
