@@ -1,5 +1,5 @@
-Panelizer 8.x-3.x-dev, xxxx-xx-xx
----------------------------------
+Panelizer 8.x-3.0-beta1, 2017-02-04
+-----------------------------------
 #2828840 by hctom, DamienMcKenna: Handle entity types that use
   RevisionableInterface but are not revisionable.
 #2664574 by artreaktor, phenaproxima, hctom, jiff, floretan: Add support for
