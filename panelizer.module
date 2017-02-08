@@ -146,6 +146,11 @@ function panelizer_panels_build_alter(&$build, PanelsDisplayVariant $panels_disp
       'panelizer_default_real_storage_id' => $panelizer_default_storage_id,
     ];
 
+    // Whether or not the current user has access to the "revert to default"
+    // action in the IPE; any user with the 'administer panelizer' will also
+    // have access.
+    $build['#attached']['drupalSettings']['panelizer']['user_permission']['revert'] = $panelizer->hasEntityPermission('revert to default', $entity, $view_mode);
+
     // Whether or not the current user has access to the "set as default" action
     // in the IPE; any user with the 'administer panelizer' will also have
     // access.

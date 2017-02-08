@@ -6,6 +6,8 @@ use Drupal\simpletest\WebTestBase;
 use Drupal\user\Entity\User;
 
 /**
+ * Confirm the defaults functionality works.
+ *
  * @group panelizer
  */
 class PanelizerDefaultsTest extends WebTestBase {
